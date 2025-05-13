@@ -91,17 +91,15 @@ class PdfApiController extends Controller
 
     $result = Process::run($command, function ($type, $buffer) {
     \Log::info("Process output ({$type}): {$buffer}");
-});
+    });
     
     if ($result->exitCode() != 0 || $result->failed()) {
         return response()->json([
             'success' => false, 
             'message' => 'Failed to merge PDF files',
             'error_details' => [
-                'command' => implode(' ', $command),
                 'exit_code' => $result->exitCode(),
                 'error_output' => $result->errorOutput(),
-                'output' => $result->output()
             ]
         ], 500);
     }
@@ -121,7 +119,7 @@ class PdfApiController extends Controller
         ->header('Content-Type', 'application/pdf')
         ->header('Content-Disposition', 'attachment; filename="' . $outputName . '"')
         ->header('Content-Length', strlen($fileContent));
-}
+    }
 
 
     /**
