@@ -1,93 +1,72 @@
-<script setup lang="ts">
-import InputError from '@/components/InputError.vue';
-import TextLink from '@/components/TextLink.vue';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import AuthBase from '@/layouts/AuthLayout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
-import { LoaderCircle } from 'lucide-vue-next';
-
-defineProps<{
-    status?: string;
-    canResetPassword: boolean;
-}>();
+<script lang="ts" setup>
+import { Link, useForm } from '@inertiajs/vue3'
 
 const form = useForm({
-    email: '',
-    password: '',
-    remember: false,
-});
+  login: '',
+  password: '',
+})
 
 const submit = () => {
-    form.post(route('login'), {
-        onFinish: () => form.reset('password'),
-    });
-};
+  form.post('/login')
+}
 </script>
 
 <template>
-    <AuthBase title="Log in to your account" description="Enter your email and password below to log in">
-        <Head title="Log in" />
-
-        <div v-if="status" class="mb-4 text-center text-sm font-medium text-green-600">
-            {{ status }}
+  <div class="flex min-h-screen items-center justify-center bg-sky-100 p-4">
+    <div class="w-full max-w-sm">
+      <div class="bg-white shadow-xl rounded-2xl p-8 border border-blue-100">
+        <div class="flex justify-center mb-6">
+          <div class="h-12 w-12 rounded-full bg-sky-500 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
         </div>
 
-        <form @submit.prevent="submit" class="flex flex-col gap-6">
-            <div class="grid gap-6">
-                <div class="grid gap-2">
-                    <Label for="email">Email address</Label>
-                    <Input
-                        id="email"
-                        type="email"
-                        required
-                        autofocus
-                        :tabindex="1"
-                        autocomplete="email"
-                        v-model="form.email"
-                        placeholder="email@example.com"
-                    />
-                    <InputError :message="form.errors.email" />
-                </div>
+        <h2 class="text-center text-xl font-semibold text-sky-700 mb-6">Sign in</h2>
 
-                <div class="grid gap-2">
-                    <div class="flex items-center justify-between">
-                        <Label for="password">Password</Label>
-                        <TextLink v-if="canResetPassword" :href="route('password.request')" class="text-sm" :tabindex="5">
-                            Forgot password?
-                        </TextLink>
-                    </div>
-                    <Input
-                        id="password"
-                        type="password"
-                        required
-                        :tabindex="2"
-                        autocomplete="current-password"
-                        v-model="form.password"
-                        placeholder="Password"
-                    />
-                    <InputError :message="form.errors.password" />
-                </div>
+        <form @submit.prevent="submit" class="space-y-5">
+          <div>
+            <label for="login" class="text-sm font-medium text-sky-700">Username or Email</label>
+            <input
+              v-model="form.login"
+              id="login"
+              type="text"
+              class="mt-1 block w-full rounded-md border border-sky-300 bg-sky-50 px-4 py-2 text-sm text-sky-900 placeholder-sky-400 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+              required
+              autofocus
+            />
+            <span class="text-xs text-red-500 mt-1" v-if="form.errors.login">{{ form.errors.login }}</span>
+          </div>
 
-                <div class="flex items-center justify-between">
-                    <Label for="remember" class="flex items-center space-x-3">
-                        <Checkbox id="remember" v-model="form.remember" :tabindex="3" />
-                        <span>Remember me</span>
-                    </Label>
-                </div>
+          <div>
+            <label for="password" class="text-sm font-medium text-sky-700">Password</label>
+            <input
+              v-model="form.password"
+              id="password"
+              type="password"
+              class="mt-1 block w-full rounded-md border border-sky-300 bg-sky-50 px-4 py-2 text-sm text-sky-900 placeholder-sky-400 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+              required
+            />
+            <span class="text-xs text-red-500 mt-1" v-if="form.errors.password">{{ form.errors.password }}</span>
+          </div>
 
-                <Button type="submit" class="mt-4 w-full" :tabindex="4" :disabled="form.processing">
-                    <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
-                    Log in
-                </Button>
-            </div>
-
-            <div class="text-center text-sm text-muted-foreground">
-                Don't have an account?
-                <TextLink :href="route('register')" :tabindex="5">Sign up</TextLink>
-            </div>
+          <button
+            type="submit"
+            class="w-full rounded-md bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow hover:bg-indigo-600 transition focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            :disabled="form.processing"
+          >
+            Sign in
+          </button>
         </form>
-    </AuthBase>
+
+        <div class="mt-6 text-center">
+          <p class="text-sm text-sky-700">
+            Don’t have an account?
+            <Link href="/register" class="text-indigo-500 font-medium hover:underline">Create account</Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
