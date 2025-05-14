@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\ActivityLogController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome');
@@ -10,6 +11,12 @@ Route::get('/', function () {
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function() {
+    Route::get('/logs', [ActivityLogController::class, 'index'])->name('logs.index');
+    Route::get('/logs/export', [ActivityLogController::class, 'export'])->name('logs.export');
+    Route::delete('/logs', [ActivityLogController::class, 'clear'])->name('logs.clear');
+});
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

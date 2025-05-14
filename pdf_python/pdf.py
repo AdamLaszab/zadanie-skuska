@@ -457,7 +457,7 @@ def main():
                 raise ValueError(f"{ERR_INVALID_ARGUMENT}::Overlay operation requires --overlay-pdf.")
             if not os.path.exists(args.overlay_pdf):
                  raise FileNotFoundError(f"{ERR_FILE_PROCESSING}::Overlay PDF file not found: {args.overlay_pdf}")
-            overlay_pdf_pages(args.input[0], args.overlay_pdf, args.output, args.overlay_page_index, args.pages or 'all')
+            overlay_pdf_pages(args.input[0], args.overlay_pdf, args.output, args.overlay_page_number, args.pages or 'all')
             output_file_generated = args.output
         elif args.operation == 'extract_text':
             output_file_generated = extract_text_from_pdf(args.input[0], args.pages or 'all', args.output)

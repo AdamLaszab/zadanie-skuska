@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Process;
+use App\Services\ActivityLogger;
 
 class PdfApiController extends Controller
 {
@@ -94,6 +95,8 @@ class PdfApiController extends Controller
         });
         
         if ($result->exitCode() != 0 || $result->failed()) {
+            $details = "Message: Failed to merge PDF files | Exit Code: {$result->exitCode()} | Error Output: {$result->errorOutput()}";
+            ActivityLogger::log("merge", $details);
             return response()->json([
                 'success' => false, 
                 'message' => 'Failed to merge PDF files',
@@ -104,12 +107,17 @@ class PdfApiController extends Controller
             ], 500);
         }
         if (!file_exists($outputPath)) {
+            $details = "Output file was not created";
+            ActivityLogger::log("merge", $details);
             return response()->json([
                 'success' => false,
                 'message' => 'Output file was not created',
                 'path' => $outputPath
             ], 500);
         }
+        
+        $details = "PDF files were merged successfully";
+        ActivityLogger::log("merge", $details);
         
         $fileContent = file_get_contents($outputPath);
         
@@ -181,6 +189,8 @@ class PdfApiController extends Controller
         });
         
         if ($result->exitCode() != 0 || $result->failed()) {
+            $details = "Message: Failed to rotate pages in PDF file | Exit Code: {$result->exitCode()} | Error Output: {$result->errorOutput()}";
+            ActivityLogger::log("rotate", $details);
             return response()->json([
                 'success' => false, 
                 'message' => 'Failed to rotate pages in PDF file',
@@ -191,12 +201,17 @@ class PdfApiController extends Controller
             ], 500);
         }
         if (!file_exists($outputPath)) {
+            $details = "Output file was not created";
+            ActivityLogger::log("rotate", $details);
             return response()->json([
                 'success' => false,
                 'message' => 'Output file was not created',
                 'path' => $outputPath
             ], 500);
         }
+        
+        $details = "PDF pages were rotated successfully";
+        ActivityLogger::log("rotate", $details);
         
         $fileContent = file_get_contents($outputPath);
         
@@ -264,6 +279,8 @@ class PdfApiController extends Controller
         });
         
         if ($result->exitCode() != 0 || $result->failed()) {
+            $details = "Message: Failed to delete pages from PDF file | Exit Code: {$result->exitCode()} | Error Output: {$result->errorOutput()}";
+            ActivityLogger::log("delete_pages", $details);
             return response()->json([
                 'success' => false, 
                 'message' => 'Failed to delete pages from PDF file',
@@ -274,12 +291,17 @@ class PdfApiController extends Controller
             ], 500);
         }
         if (!file_exists($outputPath)) {
+            $details = "Output file was not created";
+            ActivityLogger::log("delete_pages", $details);
             return response()->json([
                 'success' => false,
                 'message' => 'Output file was not created',
                 'path' => $outputPath
             ], 500);
         }
+        
+        $details = "PDF pages were deleted successfully";
+        ActivityLogger::log("delete_pages", $details);
         
         $fileContent = file_get_contents($outputPath);
         
@@ -345,8 +367,10 @@ class PdfApiController extends Controller
         $result = Process::run($command, function ($type, $buffer) {
             \Log::info("Process output ({$type}): {$buffer}");
         });
-        
+
         if ($result->exitCode() != 0 || $result->failed()) {
+            $details = "Message: Failed to extract pages from PDF file | Exit Code: {$result->exitCode()} | Error Output: {$result->errorOutput()}";
+            ActivityLogger::log("extract_pages", $details);
             return response()->json([
                 'success' => false, 
                 'message' => 'Failed to extract pages from PDF file',
@@ -357,12 +381,17 @@ class PdfApiController extends Controller
             ], 500);
         }
         if (!file_exists($outputPath)) {
+            $details = "Output file was not created";
+            ActivityLogger::log("extract_pages", $details);
             return response()->json([
                 'success' => false,
                 'message' => 'Output file was not created',
                 'path' => $outputPath
             ], 500);
         }
+        
+        $details = "PDF pages were extracted successfully";
+        ActivityLogger::log("extract_pages", $details);
         
         $fileContent = file_get_contents($outputPath);
         
@@ -434,6 +463,8 @@ class PdfApiController extends Controller
         });
         
         if ($result->exitCode() != 0 || $result->failed()) {
+            $details = "Message: Failed to encrypt PDF file | Exit Code: {$result->exitCode()} | Error Output: {$result->errorOutput()}";
+            ActivityLogger::log("encrypt", $details);
             return response()->json([
                 'success' => false, 
                 'message' => 'Failed to encrypt PDF file',
@@ -444,6 +475,8 @@ class PdfApiController extends Controller
             ], 500);
         }
         if (!file_exists($outputPath)) {
+            $details = "Output file was not created";
+            ActivityLogger::log("encrypt", $details);
             return response()->json([
                 'success' => false,
                 'message' => 'Output file was not created',
@@ -451,6 +484,9 @@ class PdfApiController extends Controller
             ], 500);
         }
         
+        $details = "PDF file was encrypted successfully";
+        ActivityLogger::log("encrypt", $details);
+
         $fileContent = file_get_contents($outputPath);
         
         $this->cleanupTempFiles($uploadPath);
@@ -517,6 +553,8 @@ class PdfApiController extends Controller
         });
         
         if ($result->exitCode() != 0 || $result->failed()) {
+            $details = "Message: Failed to decrypt PDF file | Exit Code: {$result->exitCode()} | Error Output: {$result->errorOutput()}";
+            ActivityLogger::log("decrypt", $details);
             return response()->json([
                 'success' => false, 
                 'message' => 'Failed to decrypt PDF file',
@@ -527,13 +565,18 @@ class PdfApiController extends Controller
             ], 500);
         }
         if (!file_exists($outputPath)) {
+            $details = "Output file was not created";
+            ActivityLogger::log("decrypt", $details);
             return response()->json([
                 'success' => false,
                 'message' => 'Output file was not created',
                 'path' => $outputPath
             ], 500);
         }
-        
+    
+        $details = "PDF file was decrypted successfully";
+        ActivityLogger::log("decrypt", $details);
+
         $fileContent = file_get_contents($outputPath);
         
         $this->cleanupTempFiles($uploadPath);
@@ -613,6 +656,8 @@ class PdfApiController extends Controller
         });
         
         if ($result->exitCode() != 0 || $result->failed()) {
+            $details = "Message: Failed to overlay PDF files | Exit Code: {$result->exitCode()} | Error Output: {$result->errorOutput()}";
+            ActivityLogger::log("overlay", $details);
             return response()->json([
                 'success' => false, 
                 'message' => 'Failed to overlay PDF files',
@@ -623,12 +668,17 @@ class PdfApiController extends Controller
             ], 500);
         }
         if (!file_exists($outputPath)) {
+            $details = "Output file was not created";
+            ActivityLogger::log("overlay", $details);
             return response()->json([
                 'success' => false,
                 'message' => 'Output file was not created',
                 'path' => $outputPath
             ], 500);
         }
+        
+        $details = "PDF files were overlayed successfully";
+        ActivityLogger::log("overlay", $details);
         
         $fileContent = file_get_contents($outputPath);
         
@@ -694,8 +744,10 @@ class PdfApiController extends Controller
         $result = Process::run($command, function ($type, $buffer) {
             \Log::info("Process output ({$type}): {$buffer}");
         });
-        
+
         if ($result->exitCode() != 0 || $result->failed()) {
+            $details = "Message: Failed to extract text from PDF file | Exit Code: {$result->exitCode()} | Error Output: {$result->errorOutput()}";
+            ActivityLogger::log("extract_text", $details);
             return response()->json([
                 'success' => false, 
                 'message' => 'Failed to extract text from PDF file',
@@ -706,12 +758,17 @@ class PdfApiController extends Controller
             ], 500);
         }
         if (!file_exists($outputPath)) {
+            $details = "Output file was not created";
+            ActivityLogger::log("extract_text", $details);
             return response()->json([
                 'success' => false,
                 'message' => 'Output file was not created',
                 'path' => $outputPath
             ], 500);
         }
+        
+        $details = "Text was successfully extracted from PDF file";
+        ActivityLogger::log("extract_text", $details);
         
         $fileContent = file_get_contents($outputPath);
         
@@ -773,8 +830,10 @@ class PdfApiController extends Controller
         $result = Process::run($command, function ($type, $buffer) {
             \Log::info("Process output ({$type}): {$buffer}");
         });
-        
+
         if ($result->exitCode() != 0 || $result->failed()) {
+            $details = "Message: Failed to reverse pages in PDF file | Exit Code: {$result->exitCode()} | Error Output: {$result->errorOutput()}";
+            ActivityLogger::log("reverse_pages", $details);
             return response()->json([
                 'success' => false, 
                 'message' => 'Failed to reverse pages in PDF file',
@@ -785,12 +844,17 @@ class PdfApiController extends Controller
             ], 500);
         }
         if (!file_exists($outputPath)) {
+            $details = "Output file was not created";
+            ActivityLogger::log("reverse_pages", $details);
             return response()->json([
                 'success' => false,
                 'message' => 'Output file was not created',
                 'path' => $outputPath
             ], 500);
         }
+        
+        $details = "PDF pages were reversed successfully";
+        ActivityLogger::log("reverse_pages", $details);
         
         $fileContent = file_get_contents($outputPath);
         
@@ -862,6 +926,8 @@ class PdfApiController extends Controller
         });
         
         if ($result->exitCode() != 0 || $result->failed()) {
+            $details = "Message: Failed to duplicate pages in PDF file | Exit Code: {$result->exitCode()} | Error Output: {$result->errorOutput()}";
+            ActivityLogger::log("duplicate_pages", $details);
             return response()->json([
                 'success' => false, 
                 'message' => 'Failed to duplicate pages in PDF file',
@@ -872,12 +938,17 @@ class PdfApiController extends Controller
             ], 500);
         }
         if (!file_exists($outputPath)) {
+            $details = "Output file was not created";
+            ActivityLogger::log("duplicate_pages", $details);
             return response()->json([
                 'success' => false,
                 'message' => 'Output file was not created',
                 'path' => $outputPath
             ], 500);
         }
+        
+        $details = "PDF pages were duplicated successfully";
+        ActivityLogger::log("duplicate_pages", $details);
         
         $fileContent = file_get_contents($outputPath);
         
