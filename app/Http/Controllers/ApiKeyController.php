@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Process;
 use App\Models\User;
 
 
-class ApiKeyController extends Controller {
+class ApiKeyController {
 
     private function generateApiKey(User $user)
 {

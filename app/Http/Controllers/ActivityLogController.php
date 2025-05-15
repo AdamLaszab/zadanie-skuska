@@ -6,7 +6,7 @@ use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class ActivityLogController extends Controller
+class ActivityLogController
 {
     public function index()
     {

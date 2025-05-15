@@ -12,7 +12,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Process;
 use App\Services\ActivityLogger;
 
-class PdfApiController extends Controller
+class PdfApiController
 {
     private function cleanupTempFiles($directory)
     {
