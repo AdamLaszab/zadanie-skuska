@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PdfInertiaController;
+use App\Http\Controllers\FileDownloadController;
+use App\Http\Controllers\FileTestController;
 
 // Route::get('/', function () {
 //     return Inertia::render('Welcome');
@@ -29,6 +32,15 @@ Route::post('/register', [AuthController::class, 'storeRegister']);
 Route::middleware('auth')->group(function () {
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
+
+    Route::get('/tools/pdf/merge', [PdfInertiaController::class, 'showMergeForm'])->name('pdf.tool.merge.show');
+    Route::post('/tools/pdf/merge', [PdfInertiaController::class, 'processMerge'])->name('pdf.tool.merge.process');
+
+    // Routa na sťahovanie dočasných súborov
+    Route::get('/download/temporary/{token}', [FileDownloadController::class, 'downloadTemporaryFile'])->name('file.download.temporary');
+
+    Route::get('/file-test', [FileTestController::class, 'showForm'])->name('file.test');
+Route::post('/file-test', [FileTestController::class, 'processUpload'])->name('file.test.upload');
 
 });
 

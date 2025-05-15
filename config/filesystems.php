@@ -46,6 +46,12 @@ return [
             'throw' => false,
             'report' => false,
         ],
+        
+        'pdf_temp_processing' => [ // Nový disk
+        'driver' => 'local',
+        'root'   => storage_path('app/pdf_temp_processing'), // Alebo storage_path('app/uploads') ak to má byť finálne miesto
+        'throw'  => false, // Alebo true, ak chcete výnimky pri zlyhaní
+        ],
 
         's3' => [
             'driver' => 's3',
