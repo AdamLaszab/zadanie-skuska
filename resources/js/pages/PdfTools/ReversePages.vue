@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
-import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
 
 const page = usePage();
 const flashError = computed(() => page.props.flash?.error);
@@ -42,7 +42,7 @@ function submit() {
 </script>
 
 <template>
-  <AuthenticatedLayout>
+  <DashboardLayout>
     <Head title="Reverse PDF Pages" />
     <div class="py-12">
       <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
@@ -73,7 +73,7 @@ function submit() {
         </div>
       </div>
     </div>
-  </AuthenticatedLayout>
+  </DashboardLayout>
 </template>
 
 <style scoped>

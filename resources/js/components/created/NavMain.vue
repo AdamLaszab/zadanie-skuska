@@ -9,7 +9,7 @@ defineProps<{
 </script>
 
 <template>
-  <nav class="w-64 bg-sky-700 text-sky-100 p-6 space-y-2 shadow-lg">
+  <nav class="w-64 h-screen bg-sky-700 text-sky-100 p-6 space-y-2 shadow-lg flex flex-col">
     <div class="mb-8 text-center">
       <Link href="/dashboard" class="text-2xl font-bold text-white hover:text-sky-200 transition">
         PDF Alchemist
@@ -26,7 +26,7 @@ defineProps<{
         </Link>
       </li>
     </ul>
-    <div class="absolute bottom-6 left-6 right-6">
+    <div class="mt-auto">
        <Link
           href="/logout"
           method="post"
@@ -38,11 +38,3 @@ defineProps<{
     </div>
   </nav>
 </template>
-
-<!-- <style scoped>
-/* Add any specific styles for NavMain if Tailwind isn't enough */
-/* For active link, we check if the current page URL starts with the item's href.
-   This handles cases like /users and /users/create both highlighting "Users".
-   For exact matches only, use: $page.url === item.href
-*/
-</style> -->

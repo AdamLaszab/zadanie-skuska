@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
-import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
 
 const page = usePage();
 
@@ -48,7 +48,7 @@ function submit() {
 </script>
 
 <template>
-  <AuthenticatedLayout>
+  <DashboardLayout>
     <Head title="Extract Text from PDF" />
 
     <div class="py-12">
@@ -122,5 +122,5 @@ function submit() {
         </div>
       </div>
     </div>
-  </AuthenticatedLayout>
+  </DashboardLayout>
 </template>

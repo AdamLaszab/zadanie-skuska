@@ -19,14 +19,15 @@ const defaultNavigationItems: NavItem[] = [
 </script>
 
 <template>
-  <div class="flex min-h-screen bg-sky-50">
+  <div class="flex min-h-screen max-h-screen overflow-hidden bg-sky-50">
 
-    <NavMain :items="defaultNavigationItems" />
+    <NavMain :items="defaultNavigationItems" class="h-screen flex-shrink-0" />
 
-    <main class="flex-1 p-6 sm:p-8 md:p-10">
+    <main class="flex-1 overflow-y-auto p-6 sm:p-8 md:p-10">
       <div class="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-6 sm:p-8 border border-sky-100 dark:border-gray-700 min-h-full">
         <slot />
       </div>
     </main>
+    
   </div>
 </template>

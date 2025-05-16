@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'; // Predpokladám, že tento layout používate
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
 
 // Props, ktoré stránka očakáva z controlleru po spracovaní
 const props = defineProps<{
@@ -12,7 +12,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <AuthenticatedLayout>
+  <DashboardLayout>
     <Head title="Reverse Pages Result" />
 
     <div class="py-12">
@@ -64,5 +64,5 @@ const props = defineProps<{
         </div>
       </div>
     </div>
-  </AuthenticatedLayout>
+  </DashboardLayout>
 </template>
