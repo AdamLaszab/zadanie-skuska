@@ -71,6 +71,7 @@ class AuthController
             'password' => bcrypt($validated['password']),
             'created_at' => now(),
         ]);
+        $user->assignRole('user');
         
         Auth::login($user);
         $request->session()->regenerate(); 

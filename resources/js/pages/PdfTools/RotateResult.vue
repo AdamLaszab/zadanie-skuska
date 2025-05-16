@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
 
 const props = defineProps<{
     successMessage?: string;
@@ -11,7 +11,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <AuthenticatedLayout>
+  <DashboardLayout>
     <Head title="Rotate PDF Result" />
 
     <div class="py-12">
@@ -33,7 +33,7 @@ const props = defineProps<{
                 :href="props.downloadUrl"
                 class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"
               >
-                Download {{ props.fileName }}
+                Download 
               </a>
             </div>
 
@@ -50,5 +50,5 @@ const props = defineProps<{
         </div>
       </div>
     </div>
-  </AuthenticatedLayout>
+  </DashboardLayout>
 </template>

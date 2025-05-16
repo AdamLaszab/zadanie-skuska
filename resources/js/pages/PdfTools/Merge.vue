@@ -2,6 +2,8 @@
 import { ref, computed } from 'vue'; // Pridal som computed
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
+
 
 // Nie je potrebné importovať PageProps, ak je správne augmentovaný v globálnom .d.ts
 // Ak nie, museli by ste: import type { PageProps } from '@/types'; (alebo vaša cesta)
@@ -59,7 +61,7 @@ function submit() {
 </script>
 
 <template>
-  <AuthenticatedLayout>
+  <DashboardLayout>
     <Head title="Merge PDFs" />
 
     <div class="py-12">
@@ -111,21 +113,6 @@ function submit() {
                 </div>
               </div>
 
-              <div>
-                <label for="output_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Output File Name (optional, without .pdf)
-                </label>
-                <input
-                  v-model="form.output_name"
-                  id="output_name"
-                  type="text"
-                  class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  placeholder="merged-document"
-                />
-                <p v-if="form.errors.output_name" class="mt-1 text-xs text-red-500">
-                  {{ form.errors.output_name }}
-                </p>
-              </div>
 
               <div>
                 <button
@@ -145,5 +132,5 @@ function submit() {
         </div>
       </div>
     </div>
-  </AuthenticatedLayout>
+  </DashboardLayout>
 </template>
