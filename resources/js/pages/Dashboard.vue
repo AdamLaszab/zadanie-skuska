@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
+import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
 import { Link, usePage } from '@inertiajs/vue3'; // Pridal som Link a usePage
 import type { NavItem } from '@/types'; // Predpokladám, že NavItem je v @/types/index.d.ts alebo podobne
 // Ak chcete User typ, importujte ho tiež: import type { User } from '@/types';
@@ -37,12 +38,48 @@ const pdfTools: PdfToolCard[] = [
         icon: `M12 4v16m8-8H4`, // Príklad jednoduchej SVG cesty pre plus/merge
     },
     {
-        id: 'split-pdf',
-        title: 'Split PDF',
-        description: 'Extract pages or split a PDF into multiple smaller files.',
-        href: '#', // Nahraďte skutočnou routou
+        id: 'extract-pages-pdf',
+        title: 'Extract Pages',
+        description: 'Select and extract specific pages into a new PDF document.',
+        href: route('pdf.tool.extract_pages.show'),
         icon: `M19 13l-7 7-7-7m14-4l-7-7-7 7`, // Príklad SVG pre šípky/rozdelenie
     },
+    {
+        id: 'rotate-pdf',
+        title: 'Rotate PDF',
+        description: 'Change the orientation of pages in your PDF document.',
+        href: route('pdf.tool.rotate.show'),
+        icon: `M15 3H9m6 18H9m0-9h6M16.033 6.033a7.5 7.5 0 100 11.934M16.033 6.033L19.5 2.5M16.033 6.033l-3.536 3.535`, // Príklad ikony pre rotáciu
+    },
+    {
+        id: 'delete-pages-pdf',
+        title: 'Delete Pages',
+        description: 'Remove specific pages from your PDF document.',
+        href: route('pdf.tool.delete_pages.show'),
+        icon: `M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16`, // Ikona koša
+    },
+    {
+        id: 'encrypt-pdf',
+        title: 'Encrypt PDF',
+        description: 'Protect your PDF with a password and set permissions.',
+        href: route('pdf.tool.encrypt.show'),
+        icon: `M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z`, // Ikona zámku
+    },
+    {
+        id: 'decrypt-pdf',
+        title: 'Decrypt PDF',
+        description: 'Remove password protection from your PDF file.',
+        href: route('pdf.tool.decrypt.show'),
+        icon: `M18 8A6 6 0 006 8v7H4a2 2 0 00-2 2v4a2 2 0 002 2h16a2 2 0 002-2v-4a2 2 0 00-2-2h-2V8zm-6-4a4 4 0 100 8 4 4 0 000-8zM8 8V6a4 4 0 118 0v2H8z`, // Ikona otvoreného zámku
+    },
+    {
+        id: 'overlay-pdf',
+        title: 'Overlay PDF',
+        description: 'Add a watermark, stamp, or overlay one PDF onto another.',
+        href: route('pdf.tool.overlay.show'),
+        icon: `M17.657 18.657l-5-5a2 2 0 00-2.828 0l-5 5a2 2 0 002.828 2.828l5-5a2 2 0 000-2.828l5-5a2 2 0 00-2.828-2.828l-5 5M6 6h.01M6 12h.01M6 18h.01M12 6h.01M12 18h.01M18 6h.01M18 12h.01`, // Príklad ikony
+    },
+
     // Sem pridajte ďalšie PDF nástroje ako objekty
     // {
     //     id: 'rotate-pdf',
@@ -56,7 +93,7 @@ const pdfTools: PdfToolCard[] = [
 </script>
 
 <template>
-    <DashboardLayout :items="navigationItems" :header-title="'Dashboard'">
+    <AuthenticatedLayout>
         <Head title="Dashboard" /> 
 
         <div class="mb-8">  
@@ -106,5 +143,5 @@ const pdfTools: PdfToolCard[] = [
             -->
         </div>
 
-    </DashboardLayout>
+    </AuthenticatedLayout>
 </template>

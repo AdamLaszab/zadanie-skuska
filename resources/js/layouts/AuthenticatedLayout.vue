@@ -27,8 +27,6 @@ const logout = () => {
 // Príklad navigácie pre bočnú lištu a hornú lištu (môžete ich mať oddelené)
 const navigation = [
     { name: 'Dashboard', href: route('dashboard'), current: route().current('dashboard') },
-    { name: 'Merge PDF', href: route('pdf.tool.merge.show'), current: route().current('pdf.tool.merge.show') },
-    { name: 'Split PDF', href: '#', current: false }, // Príklad pre ďalšie nástroje
     // ... ďalšie nástroje
 ];
 

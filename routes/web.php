@@ -40,8 +40,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/download/temporary/{token}', [FileDownloadController::class, 'downloadTemporaryFile'])->name('file.download.temporary');
 
     Route::get('/file-test', [FileTestController::class, 'showForm'])->name('file.test');
-Route::post('/file-test', [FileTestController::class, 'processUpload'])->name('file.test.upload');
-
+    Route::post('/file-test', [FileTestController::class, 'processUpload'])->name('file.test.upload');
+    Route::get('/tools/pdf/extract-pages', [PdfInertiaController::class, 'showExtractPagesForm'])->name('pdf.tool.extract_pages.show');
+    Route::post('/tools/pdf/extract-pages', [PdfInertiaController::class, 'processExtractPages'])->name('pdf.tool.extract_pages.process');
+    Route::get('/tools/pdf/rotate', [PdfInertiaController::class, 'showRotateForm'])->name('pdf.tool.rotate.show');
+    Route::post('/tools/pdf/rotate', [PdfInertiaController::class, 'processRotate'])->name('pdf.tool.rotate.process');
+    Route::get('/tools/pdf/delete-pages', [PdfInertiaController::class, 'showDeletePagesForm'])->name('pdf.tool.delete_pages.show');
+    Route::post('/tools/pdf/delete-pages', [PdfInertiaController::class, 'processDeletePages'])->name('pdf.tool.delete_pages.process');
+    Route::get('/tools/pdf/encrypt', [PdfInertiaController::class, 'showEncryptForm'])->name('pdf.tool.encrypt.show');
+    Route::post('/tools/pdf/encrypt', [PdfInertiaController::class, 'processEncrypt'])->name('pdf.tool.encrypt.process');
+    Route::get('/tools/pdf/decrypt', [PdfInertiaController::class, 'showDecryptForm'])->name('pdf.tool.decrypt.show');
+    Route::post('/tools/pdf/decrypt', [PdfInertiaController::class, 'processDecrypt'])->name('pdf.tool.decrypt.process');
+    Route::get('/tools/pdf/overlay', [PdfInertiaController::class, 'showOverlayForm'])->name('pdf.tool.overlay.show');
+    Route::post('/tools/pdf/overlay', [PdfInertiaController::class, 'processOverlay'])->name('pdf.tool.overlay.process');
 });
 
 

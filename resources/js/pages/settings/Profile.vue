@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<!-- <script setup lang="ts">
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 
 import DeleteUser from '@/components/DeleteUser.vue';
@@ -105,4 +105,4 @@ const submit = () => {
             <DeleteUser />
         </SettingsLayout>
     </AppLayout>
-</template>
+</template> -->

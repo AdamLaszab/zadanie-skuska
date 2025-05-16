@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<!-- <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
 
 import AppearanceTabs from '@/components/AppearanceTabs.vue';
@@ -27,4 +27,4 @@ const breadcrumbItems: BreadcrumbItem[] = [
             </div>
         </SettingsLayout>
     </AppLayout>
-</template>
+</template> -->
