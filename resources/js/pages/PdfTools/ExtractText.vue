@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'; // Odstránil som watch
-import { Head, useForm, usePage } from '@inertiajs/vue3';
-import DashboardLayout from '@/layouts/DashboardLayout.vue';
+import { ref, computed } from 'vue';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
 
 const page = usePage();
 
@@ -9,24 +9,20 @@ const flashError = computed(() => page.props.flash?.error);
 const flashSuccess = computed(() => page.props.flash?.success);
 const globalErrors = computed(() => page.props.errors as Record<string, string> | undefined);
 
-interface EncryptForm {
+interface ExtractTextForm {
   file: File | null;
-  user_password: string;
-  // owner_password: string; // ODSTRÁNENÉ
+  pages: string; // napr. "1,3-5", "all"
   output_name: string;
-  [key: string]: any;
+  [key: string]: any; // Pre FormDataType
 }
 
-const form = useForm<EncryptForm>({
+const form = useForm<ExtractTextForm>({
   file: null,
-  user_password: '',
-  // owner_password: '', // ODSTRÁNENÉ
+  pages: 'all', // Predvolene všetky strany
   output_name: '',
 });
 
 const fileInput = ref<HTMLInputElement | null>(null);
-// const showOwnerPassword = ref(false); // ODSTRÁNENÉ
-// watch pre showOwnerPassword ODSTRÁNENÝ
 
 function handleFileChange(event: Event) {
   const target = event.target as HTMLInputElement;
@@ -39,31 +35,28 @@ function handleFileChange(event: Event) {
 
 function submit() {
   if (page.props.flash) page.props.flash = {};
-
-  // Už nie je potrebné transformovať dáta špeciálne pre owner_password
-  form.post(route('pdf.tool.encrypt.process'), {
+  form.post(route('pdf.tool.extract_text.process'), {
     onSuccess: () => {
-      form.reset(); // Resetne všetky polia formulára
+      form.reset('pages', 'output_name');
       if (fileInput.value) {
-        fileInput.value.value = '';
+        // fileInput.value.value = ''; // Ak chcete vyčistiť po úspechu
+        // form.file = null;
       }
-      // showOwnerPassword.value = false; // ODSTRÁNENÉ
     },
   });
 }
 </script>
 
 <template>
-  <DashboardLayout>
-    <Head title="Encrypt PDF" />
+  <AuthenticatedLayout>
+    <Head title="Extract Text from PDF" />
 
     <div class="py-12">
       <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
           <div class="p-6 text-gray-900 dark:text-gray-100">
-            <h2 class="text-2xl font-semibold mb-6 text-center">Encrypt PDF with Password</h2>
+            <h2 class="text-2xl font-semibold mb-6 text-center">Extract Text from PDF</h2>
 
-            <!-- Flash správy a globálne chyby -->
             <div v-if="flashSuccess" class="mb-4 p-4 bg-green-100 text-green-700 border border-green-400 rounded">
                 {{ flashSuccess }}
             </div>
@@ -73,14 +66,12 @@ function submit() {
             <div v-if="globalErrors?.process_error" class="mb-4 p-4 bg-red-100 text-red-700 border border-red-400 rounded">
                 {{ globalErrors.process_error }}
             </div>
-            <!-- Chyby formulára -->
              <div v-if="form.hasErrors" class="mb-4 p-4 bg-red-50 text-red-700 border border-red-200 rounded">
                 <p class="font-medium">Please correct the following errors:</p>
                 <ul class="list-disc list-inside mt-1">
                     <li v-for="(error, key) in form.errors" :key="key">{{ error }}</li>
                 </ul>
             </div>
-
 
             <form @submit.prevent="submit" class="space-y-6">
               <div>
@@ -98,35 +89,32 @@ function submit() {
               </div>
 
               <div>
-                <label for="user_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Password to Encrypt and Open PDF
+                <label for="pages" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Pages to Extract Text From (e.g., 1-3, 5, all)
                 </label>
                 <input
-                  v-model="form.user_password"
-                  id="user_password"
-                  type="password"
+                  v-model="form.pages"
+                  id="pages"
+                  type="text"
                   class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  required
+                  placeholder="all"
                 />
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Leave blank or type 'all' to extract from all pages.</p>
               </div>
 
-              <!-- ODSTRÁNENÁ ČASŤ PRE OWNER PASSWORD -->
-              <!-- <div class="mt-4"> ...checkbox... </div> -->
-              <!-- <div v-if="showOwnerPassword"> ...input for owner_password... </div> -->
-
-              
+             
 
               <div>
                 <button
                   type="submit"
-                  :disabled="form.processing || !form.file || !form.user_password"
+                  :disabled="form.processing || !form.file"
                   class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 disabled:opacity-50"
                 >
                   <svg v-if="form.processing" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  {{ form.processing ? 'Processing...' : 'Encrypt PDF' }}
+                  {{ form.processing ? 'Processing...' : 'Extract Text' }}
                 </button>
               </div>
             </form>
@@ -134,5 +122,5 @@ function submit() {
         </div>
       </div>
     </div>
-  </DashboardLayout>
+  </AuthenticatedLayout>
 </template>

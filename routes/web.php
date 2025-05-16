@@ -53,6 +53,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/tools/pdf/decrypt', [PdfInertiaController::class, 'processDecrypt'])->name('pdf.tool.decrypt.process');
     Route::get('/tools/pdf/overlay', [PdfInertiaController::class, 'showOverlayForm'])->name('pdf.tool.overlay.show');
     Route::post('/tools/pdf/overlay', [PdfInertiaController::class, 'processOverlay'])->name('pdf.tool.overlay.process');
+    Route::get('/tools/pdf/extract-text', [PdfInertiaController::class, 'showExtractTextForm'])->name('pdf.tool.extract_text.show');
+    Route::post('/tools/pdf/extract-text', [PdfInertiaController::class, 'processExtractText'])->name('pdf.tool.extract_text.process');
+    Route::get('/tools/pdf/reverse-pages', [PdfInertiaController::class, 'showReversePagesForm'])->name('pdf.tool.reverse_pages.show');
+    Route::post('/tools/pdf/reverse-pages', [PdfInertiaController::class, 'processReversePages'])->name('pdf.tool.reverse_pages.process');
+    Route::get('/tools/pdf/duplicate-pages', [PdfInertiaController::class, 'showDuplicatePagesForm'])->name('pdf.tool.duplicate_pages.show');
+    Route::post('/tools/pdf/duplicate-pages', [PdfInertiaController::class, 'processDuplicatePages'])->name('pdf.tool.duplicate_pages.process');
 });
 
 

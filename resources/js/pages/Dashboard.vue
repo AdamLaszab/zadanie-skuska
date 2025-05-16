@@ -68,6 +68,27 @@ const pdfTools: PdfToolCard[] = [
         href: route('pdf.tool.overlay.show'),
         icon: `M17.657 18.657l-5-5a2 2 0 00-2.828 0l-5 5a2 2 0 002.828 2.828l5-5a2 2 0 000-2.828l5-5a2 2 0 00-2.828-2.828l-5 5M6 6h.01M6 12h.01M6 18h.01M12 6h.01M12 18h.01M18 6h.01M18 12h.01`,
     },
+    {
+        id: 'extract-text-pdf',
+        title: 'Extract Text',
+        description: 'Extract all text content from your PDF into a text file.',
+        href: route('pdf.tool.extract_text.show'),
+        icon: `M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z`, // Ikona dokumentu s textom
+    },
+    {
+        id: 'reverse-pages-pdf',
+        title: 'Reverse Pages',
+        description: 'Reverse the order of all pages in your PDF document.',
+        href: route('pdf.tool.reverse_pages.show'),
+        icon: `M17 8l4 4m0 0l-4 4m4-4H3`, // Ikona pre obrátenie/šípka späť
+    },
+    {
+        id: 'duplicate-pages-pdf',
+        title: 'Duplicate Pages',
+        description: 'Duplicate specified pages within your PDF document.',
+        href: route('pdf.tool.duplicate_pages.show'),
+        icon: `M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z`, // Ikona pre kópie/duplikáty
+    },
 ];
 
 </script>
@@ -113,6 +134,7 @@ const pdfTools: PdfToolCard[] = [
                     </span>
                 </div>
             </Link>
+
         </div>
     </DashboardLayout>
 </template>

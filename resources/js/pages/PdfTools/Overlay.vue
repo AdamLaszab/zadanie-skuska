@@ -97,7 +97,14 @@ function submit() {
                   type="file"
                   accept=".pdf"
                   @change="handleMainFileChange"
-                  class="mt-1 block w-full text-sm text-gray-500 file-input-style"
+                  class="mt-1 block w-full text-sm text-gray-500 text-gray-500 dark:text-gray-400
+                       file:mr-4 file:py-2 file:px-4
+                       file:rounded-md file:border-0
+                       file:text-sm file:font-semibold
+                       file:bg-sky-50 file:text-sky-700
+                       dark:file:bg-sky-700 dark:file:text-sky-50
+                       hover:file:bg-sky-100 dark:hover:file:bg-sky-600
+                       focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"
                 />
                 <p v-if="form.errors.main_file" class="mt-1 text-xs text-red-500">{{ form.errors.main_file }}</p>
               </div>
@@ -110,9 +117,16 @@ function submit() {
                   ref="overlayFileInput"
                   id="overlay_file"
                   type="file"
-                  accept=".pdf"
+                  accept=".pdf , .jpeg, .png"
                   @change="handleOverlayFileChange"
-                  class="mt-1 block w-full text-sm text-gray-500 file-input-style"
+                  class="mt-1 block w-full text-sm text-gray-500 text-gray-500 dark:text-gray-400
+                       file:mr-4 file:py-2 file:px-4
+                       file:rounded-md file:border-0
+                       file:text-sm file:font-semibold
+                       file:bg-sky-50 file:text-sky-700
+                       dark:file:bg-sky-700 dark:file:text-sky-50
+                       hover:file:bg-sky-100 dark:hover:file:bg-sky-600
+                       focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500"
                 />
                  <p v-if="form.errors.overlay_file" class="mt-1 text-xs text-red-500">{{ form.errors.overlay_file }}</p>
               </div>
@@ -127,7 +141,9 @@ function submit() {
                     id="overlay_page_number"
                     type="number"
                     min="1"
-                    class="mt-1 block w-full input-style"
+                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm 
+                           focus:border-sky-500 focus:ring-sky-500 sm:text-sm bg-white dark:bg-gray-700 
+                           text-gray-900 dark:text-gray-100"
                     placeholder="1"
                     />
                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Which page from the Overlay PDF to use.</p>
@@ -141,7 +157,9 @@ function submit() {
                     v-model="form.target_pages"
                     id="target_pages"
                     type="text"
-                    class="mt-1 block w-full input-style"
+                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm 
+                           focus:border-sky-500 focus:ring-sky-500 sm:text-sm bg-white dark:bg-gray-700 
+                           text-gray-900 dark:text-gray-100"
                     placeholder="all"
                     />
                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">e.g., "all", "1,3-5".</p>
@@ -150,19 +168,7 @@ function submit() {
               </div>
 
 
-              <div>
-                <label for="output_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Output File Name (optional, without .pdf)
-                </label>
-                <input
-                  v-model="form.output_name"
-                  id="output_name"
-                  type="text"
-                  class="mt-1 block w-full input-style"
-                  placeholder="overlaid-document"
-                />
-                <p v-if="form.errors.output_name" class="mt-1 text-xs text-red-500">{{ form.errors.output_name }}</p>
-              </div>
+            
 
               <div>
                 <button
@@ -184,19 +190,3 @@ function submit() {
     </div>
   </DashboardLayout>
 </template>
-
-<style scoped>
-.file-input-style {
-    @apply text-gray-500 dark:text-gray-400
-           file:mr-4 file:py-2 file:px-4
-           file:rounded-md file:border-0
-           file:text-sm file:font-semibold
-           file:bg-sky-50 file:text-sky-700
-           dark:file:bg-sky-700 dark:file:text-sky-50
-           hover:file:bg-sky-100 dark:hover:file:bg-sky-600
-           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500;
-}
-.input-style {
-    @apply rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100;
-}
-</style>

@@ -2,7 +2,9 @@ import sys
 from pypdf import PdfWriter, PdfReader
 from pypdf.errors import PdfReadError, WrongPasswordError
 import argparse
+from PIL import Image
 import os
+import io
 
 ERR_INVALID_ARGUMENT = "INVALID_ARGUMENT"
 ERR_FILE_PROCESSING = "FILE_PROCESSING_ERROR"
@@ -240,48 +242,96 @@ def decrypt_pdf_file(input_path, output_path, password):
         if writer:
             writer.close()
 
-def overlay_pdf_pages(main_pdf_path, overlay_pdf_path, output_path, overlay_page_number=1, target_pages_spec=None):
+IMAGE_EXTS = {'.png', '.jpg', '.jpeg'}
+def _make_pdf_reader(path: str) -> PdfReader:
+    """
+    If `path` is an image, convert it in-memory to a 1-page PDF
+    (Pillow auto-embeds any alpha mask). Otherwise, read the PDF.
+    """
+    ext = os.path.splitext(path)[1].lower()
+    if ext in IMAGE_EXTS:
+        img = Image.open(path)
+        buf = io.BytesIO()
+        img.save(buf, format="PDF")
+        buf.seek(0)
+        return PdfReader(buf)
+    else:
+        return PdfReader(path)
+
+def overlay_pdf_pages(
+    main_pdf_path: str,
+    overlay_path: str,
+    output_path: str,
+    overlay_page_number: int = 1,
+    target_pages_spec: str = None
+):
     writer = PdfWriter()
     try:
-        main_reader = PdfReader(main_pdf_path)
-        overlay_reader = PdfReader(overlay_pdf_path)
-        
-        overlay_page_index_0_based = overlay_page_number - 1
+        main_reader    = PdfReader(main_pdf_path)
+        overlay_reader = _make_pdf_reader(overlay_path)
 
+        # --- Validation ---
         if not main_reader.pages:
-            raise ValueError(f"{ERR_FILE_PROCESSING}::Main PDF '{os.path.basename(main_pdf_path)}' for overlay has no pages.")
+            raise ValueError(f"Main PDF '{os.path.basename(main_pdf_path)}' has no pages.")
         if not overlay_reader.pages:
-            raise ValueError(f"{ERR_FILE_PROCESSING}::Overlay PDF '{os.path.basename(overlay_pdf_path)}' has no pages.")
-        if not (0 <= overlay_page_index_0_based < len(overlay_reader.pages)):
-            raise ValueError(f"{ERR_INVALID_ARGUMENT}::Overlay page number {overlay_page_number} is out of bounds for overlay PDF which has {len(overlay_reader.pages)} pages.")
-        overlay_page_to_use = overlay_reader.pages[overlay_page_index_0_based]
-        num_total_main_pages = len(main_reader.pages)
-        pages_to_overlay_on = parse_page_spec(target_pages_spec, num_total_main_pages)
-        for i, main_page_content in enumerate(main_reader.pages):
-            if i in pages_to_overlay_on:
-                main_page_content.merge_page(overlay_page_to_use)
-            writer.add_page(main_page_content)
+            raise ValueError(f"Overlay '{os.path.basename(overlay_path)}' has no pages.")
+
+        idx = overlay_page_number - 1
+        if not (0 <= idx < len(overlay_reader.pages)):
+            raise ValueError(
+                f"Overlay page {overlay_page_number} out of range (1–{len(overlay_reader.pages)})."
+            )
+
+        overlay_page = overlay_reader.pages[idx]
+        total_pages  = len(main_reader.pages)
+        pages_to_do  = parse_page_spec(target_pages_spec, total_pages)
+
+        # --- Build each page ---
+        for i, main_page in enumerate(main_reader.pages):
+            if i in pages_to_do:
+                # 1) measure main page
+                mlx, mly = main_page.mediabox.lower_left
+                mux, muy = main_page.mediabox.upper_right
+                main_w, main_h = mux - mlx, muy - mly
+
+                # 2) measure overlay
+                olx, oly = overlay_page.mediabox.lower_left
+                oux, ouy = overlay_page.mediabox.upper_right
+                ol_w, ol_h = oux - olx, ouy - oly
+
+                # 3) create a blank “canvas” the size of the main page
+                bg = writer.add_blank_page(width=main_w, height=main_h)
+
+                # 4) draw overlay (centered)
+                tx = (main_w - ol_w) / 2
+                ty = (main_h - ol_h) / 2
+                bg.merge_translated_page(overlay_page, tx, ty)
+
+                # 5) draw main page content *on top*
+                bg.merge_page(main_page)
+
+                # (bg is already in writer.pages)
+            else:
+                # pages that aren’t targeted just get copied straight over
+                writer.add_page(main_page)
+
+        # --- Write out ---
         with open(output_path, "wb") as f_out:
             writer.write(f_out)
+
     except FileNotFoundError as fnf:
-        missing_file = ""
-        if not os.path.exists(main_pdf_path): missing_file = main_pdf_path
-        elif not os.path.exists(overlay_pdf_path): missing_file = overlay_pdf_path
-        if missing_file:
-             raise FileNotFoundError(f"{ERR_FILE_PROCESSING}::Input PDF not found for overlay: {missing_file}")
-        else:
-             raise FileNotFoundError(f"{ERR_FILE_PROCESSING}::An input PDF for overlay was not found (unexpected).")
+        missing = main_pdf_path if not os.path.exists(main_pdf_path) else overlay_path
+        raise FileNotFoundError(f"Input not found: {missing}") from fnf
+
     except WrongPasswordError as wpe:
-        raise ValueError(f"{ERR_DECRYPTION_FAILED}::An input PDF for the overlay operation is password protected. Please decrypt it first. Details: {wpe}")
+        raise ValueError(f"Encrypted PDF—decrypt first: {wpe}")
+
     except PdfReadError as pre:
-        raise ValueError(f"{ERR_FILE_PROCESSING}::Error reading PDF during overlay: {pre}")
-    except IOError as e:
-        raise IOError(f"{ERR_IO}::Error writing overlaid PDF: {e}")
-    except ValueError as ve:
-        if str(ve).startswith(ERR_PAGE_RANGE) or str(ve).startswith(ERR_INVALID_ARGUMENT): raise
-        raise ValueError(f"{ERR_FILE_PROCESSING}::Error during PDF overlay: {ve}")
-    except Exception as e:
-        raise RuntimeError(f"{ERR_FILE_PROCESSING}::Unexpected error during PDF overlay: {type(e).__name__} - {e}")
+        raise ValueError(f"PDF read error: {pre}")
+
+    except IOError as ioe:
+        raise IOError(f"Write error: {ioe}")
+
     finally:
         writer.close()
 
