@@ -890,13 +890,19 @@ public function showOverlayForm()
     public function processOverlay(Request $request)
     {
         // Validácia pre dva súbory: 'main_file' a 'overlay_file'
-        $validator = Validator::make($request->all(), [
-            'main_file' => ['required', 'file', 'mimes:pdf', 'max:50000'],
-            'overlay_file' => ['required', 'file', 'mimes:pdf', 'max:50000'],
-            'overlay_page_number' => ['sometimes', 'nullable', 'integer', 'min:1'],
-            'target_pages' => ['sometimes', 'nullable', 'string', 'regex:/^[0-9,\-\sA-Za-z]+$/'], // napr. "all", "1,3-5"
-            'output_name' => ['sometimes', 'nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_-]+$/'],
+       $validator = Validator::make($request->all(), [
+            'main_file'    => ['required','file','mimes:pdf','max:50000'],
+            'overlay_file' => [
+                'required',
+                'file',
+                'mimes:pdf,png,jpeg,jpg',   // ← allow images now
+                'max:50000'
+            ],
+            'overlay_page_number' => ['sometimes','nullable','integer','min:1'],
+            'target_pages'        => ['sometimes','nullable','string','regex:/^[0-9,\-\sA-Za-z]+$/'],
+            'output_name'         => ['sometimes','nullable','string','max:255','regex:/^[a-zA-Z0-9_-]+$/'],
         ]);
+
 
         if ($validator->fails()) {
             Log::error('Validation failed for PDF overlay.', $validator->errors()->toArray());
@@ -1042,6 +1048,411 @@ public function showOverlayForm()
                 $this->cleanupTempDirectoryOnDisk($batchDirectoryRelative, $this->processingDisk);
             }
             ActivityLogger::log("overlay_inertia_CRITICAL_ERROR", "Exception: " . $e->getMessage(), $request->user());
+            return back()->withErrors(['process_error' => 'A critical error occurred. Please contact support.'])->withInput();
+        }
+    }
+    public function showExtractTextForm()
+    {
+        return Inertia::render('PdfTools/ExtractText');
+    }
+
+    public function processExtractText(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'file' => ['required', 'file', 'mimes:pdf', 'max:50000'],
+            'pages' => ['sometimes', 'nullable', 'string', 'regex:/^[0-9,\-\sA-Za-z]+$/'], // napr. "all", "1,3-5"
+            'output_name' => ['sometimes', 'nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_-]+$/'],
+        ]);
+
+        if ($validator->fails()) {
+            Log::error('Validation failed for PDF text extraction.', $validator->errors()->toArray());
+            return back()->withErrors($validator->errors())->withInput();
+        }
+
+        Log::info("PDF Extract Text process started using disk '{$this->processingDisk}'.");
+
+        $uploadedFile = $request->file('file');
+        $pagesToExtractFrom = $request->input('pages');
+        $pagesToExtractFromSanitized = $pagesToExtractFrom ? preg_replace('/\s+/', '', $pagesToExtractFrom) : 'all'; // Default na 'all'
+
+        $outputNameForDownload = $request->input('output_name') ?? 'extracted-text';
+        // Výstup bude .txt súbor
+        if (!Str::endsWith(strtolower($outputNameForDownload), '.txt')) {
+            $outputNameForDownload .= '.txt';
+        }
+        Log::info("Output TXT name (for download) set to: {$outputNameForDownload}");
+
+        $batchId = Str::uuid();
+        $batchDirectoryRelative = $batchId;
+        $batchPathAbsolute = Storage::disk($this->processingDisk)->path($batchDirectoryRelative);
+
+        Log::info("Batch directory (relative to disk '{$this->processingDisk}'): {$batchDirectoryRelative}");
+        Log::info("Batch path (absolute for Python): {$batchPathAbsolute}");
+
+        try {
+            if (!Storage::disk($this->processingDisk)->makeDirectory($batchDirectoryRelative)) {
+                Log::error("Storage::makeDirectory FAILED for: '{$batchDirectoryRelative}' on disk '{$this->processingDisk}'.");
+                return back()->withErrors(['process_error' => "System error: Could not create temporary directory."])->withInput();
+            }
+            Log::info("Successfully created batch directory (absolute): {$batchPathAbsolute}");
+
+            $originalExtension = $uploadedFile->getClientOriginalExtension();
+            $inputTempFilename = Str::uuid() . '.' . $originalExtension; // Vstupný PDF
+            $inputFileRelativePathOnDisk = $batchDirectoryRelative . '/' . $inputTempFilename;
+
+            Log::info("Storing uploaded PDF as '{$inputTempFilename}' to '{$inputFileRelativePathOnDisk}' on disk '{$this->processingDisk}'.");
+            $uploadedFile->storeAs($batchDirectoryRelative, $inputTempFilename, $this->processingDisk);
+            $inputFilePathAbsolute = Storage::disk($this->processingDisk)->path($inputFileRelativePathOnDisk);
+
+            if (!file_exists($inputFilePathAbsolute)) {
+                Log::error("Uploaded PDF FAILED to store/verify at: {$inputFilePathAbsolute}.");
+                $this->cleanupTempDirectoryOnDisk($batchDirectoryRelative, $this->processingDisk);
+                return back()->withErrors(['process_error' => "Error saving uploaded PDF."])->withInput();
+            }
+            Log::info("Uploaded PDF successfully stored at: {$inputFilePathAbsolute}");
+
+            // Názov a cesta pre výstupný .txt súbor (vytvorený Pythonom)
+            $outputPythonTxtFilename = Str::uuid() . '.txt';
+            $outputTxtFilePathAbsoluteByPython = $batchPathAbsolute . DIRECTORY_SEPARATOR . $outputPythonTxtFilename;
+            Log::info("PHP expects Python to create extracted text file at: {$outputTxtFilePathAbsoluteByPython}");
+
+            $command = [
+                base_path(env('PYTHON_VENV_EXECUTABLE', 'python')),
+                base_path(env('PYTHON_SCRIPT_PATH', 'scripts/pdf_processor.py')),
+                "--operation", "extract_text",
+                "--input", $inputFilePathAbsolute,
+                "--output", $outputTxtFilePathAbsoluteByPython, // Python vytvorí tento .txt súbor
+            ];
+            if ($pagesToExtractFromSanitized && strtolower($pagesToExtractFromSanitized) !== 'all') {
+                $command[] = "--pages";
+                $command[] = $pagesToExtractFromSanitized;
+            } elseif (empty($pagesToExtractFromSanitized)) {
+                $command[] = "--pages";
+                $command[] = "all";
+            }
+
+
+            Log::info('Executing Python command for extract_text: ' . implode(' ', $command));
+            $result = Process::run($command);
+
+            Log::info("Python Process (extract_text) Ran. Successful: " . ($result->successful() ? 'Yes' : 'No') . ", Exit Code: " . $result->exitCode());
+            Log::info("Python STDOUT (extract_text): '" . trim($result->output()) . "'");
+            Log::info("Python STDERR (extract_text): '" . trim($result->errorOutput()) . "'");
+
+            if (!$result->successful()) {
+                $errorOutput = $result->errorOutput();
+                Log::error("Python script (extract_text) execution failed. Error: {$errorOutput}");
+                $this->cleanupTempDirectoryOnDisk($batchDirectoryRelative, $this->processingDisk);
+                return back()->withErrors(['process_error' => 'Failed to extract text from PDF. Details: ' . $errorOutput])->withInput();
+            }
+            
+            $finalExtractedTextFilePathAbsolute = "";
+            $pythonReturnedPath = trim($result->output());
+
+            if (!empty($pythonReturnedPath) && file_exists($pythonReturnedPath)) {
+                $finalExtractedTextFilePathAbsolute = $pythonReturnedPath;
+                 if ($pythonReturnedPath !== $outputTxtFilePathAbsoluteByPython) {
+                    Log::warning("Path from Python STDOUT ('{$pythonReturnedPath}') differs from PHP's expected output path ('{$outputTxtFilePathAbsoluteByPython}'), but STDOUT path is valid. Using STDOUT path.");
+                }
+            } elseif (file_exists($outputTxtFilePathAbsoluteByPython)) {
+                Log::warning("Python STDOUT was not a valid path or empty, but file exists at PHP's expected output path: '{$outputTxtFilePathAbsoluteByPython}'. Using this path.");
+                $finalExtractedTextFilePathAbsolute = $outputTxtFilePathAbsoluteByPython;
+            } else {
+                Log::error("Extracted text file was not found. Python STDOUT: '{$pythonReturnedPath}', PHP Expected: '{$outputTxtFilePathAbsoluteByPython}'");
+                $this->cleanupTempDirectoryOnDisk($batchDirectoryRelative, $this->processingDisk);
+                return back()->withErrors(['process_error' => 'Processing error: Could not retrieve extracted text file.'])->withInput();
+            }
+            Log::info("Using final extracted text file (absolute path): {$finalExtractedTextFilePathAbsolute}");
+
+            ActivityLogger::log("extract_text_inertia_success", "Text extracted from PDF: {$outputNameForDownload}", $request->user());
+
+            $extractedTextFileRelativeOnDisk = str_replace(Storage::disk($this->processingDisk)->path(''), '', $finalExtractedTextFilePathAbsolute);
+            $extractedTextFileRelativeOnDisk = ltrim($extractedTextFileRelativeOnDisk, DIRECTORY_SEPARATOR);
+
+            $downloadToken = Str::random(40);
+            session(['download_file_path_' . $downloadToken => $extractedTextFileRelativeOnDisk]);
+            session(['download_file_disk_' . $downloadToken => $this->processingDisk]);
+            session(['download_file_name_' . $downloadToken => $outputNameForDownload]); // Názov pre stiahnutie .txt
+            $downloadUrl = route('file.download.temporary', ['token' => $downloadToken]);
+
+            Log::info("Generated download URL: {$downloadUrl} for extracted text file '{$extractedTextFileRelativeOnDisk}' on disk '{$this->processingDisk}'.");
+
+            // Zvážte, či chcete zobraziť obsah textu priamo, alebo len dať link na stiahnutie.
+            // Pre konzistenciu s ostatnými nástrojmi, pošleme na result stránku s download linkom.
+            return Inertia::render('PdfTools/ExtractTextResult', [
+                'successMessage' => 'Text extracted from PDF successfully!',
+                'downloadUrl' => $downloadUrl,
+                'fileName' => $outputNameForDownload,
+            ]);
+
+        } catch (\Throwable $e) {
+            Log::critical("Critical error during PDF extract_text: " . $e->getMessage(), ['exception' => $e]);
+            if (isset($batchDirectoryRelative)) {
+                $this->cleanupTempDirectoryOnDisk($batchDirectoryRelative, $this->processingDisk);
+            }
+            ActivityLogger::log("extract_text_inertia_CRITICAL_ERROR", "Exception: " . $e->getMessage(), $request->user());
+            return back()->withErrors(['process_error' => 'A critical error occurred. Please contact support.'])->withInput();
+        }
+    }
+    public function showReversePagesForm()
+{
+    return Inertia::render('PdfTools/ReversePages');
+}
+
+public function processReversePages(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'file' => ['required', 'file', 'mimes:pdf', 'max:50000'],
+        'output_name' => ['sometimes', 'nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_-]+$/'],
+    ]);
+
+    if ($validator->fails()) {
+        Log::error('Validation failed for PDF page reversing.', $validator->errors()->toArray());
+        return back()->withErrors($validator->errors())->withInput();
+    }
+
+    Log::info("PDF Reverse Pages process started using disk '{$this->processingDisk}'.");
+
+    $uploadedFile = $request->file('file');
+    $outputNameForDownload = $request->input('output_name') ?? 'reversed-document';
+    if (!Str::endsWith($outputNameForDownload, '.pdf')) {
+        $outputNameForDownload .= '.pdf';
+    }
+    Log::info("Output PDF name (for download) set to: {$outputNameForDownload}");
+
+    $batchId = Str::uuid();
+    $batchDirectoryRelative = $batchId;
+    $batchPathAbsolute = Storage::disk($this->processingDisk)->path($batchDirectoryRelative);
+
+    Log::info("Batch directory (relative to disk '{$this->processingDisk}'): {$batchDirectoryRelative}");
+    Log::info("Batch path (absolute for Python): {$batchPathAbsolute}");
+
+    try {
+        if (!Storage::disk($this->processingDisk)->makeDirectory($batchDirectoryRelative)) {
+            Log::error("Storage::makeDirectory FAILED for: '{$batchDirectoryRelative}' on disk '{$this->processingDisk}'.");
+            return back()->withErrors(['process_error' => "System error: Could not create temporary directory."])->withInput();
+        }
+        Log::info("Successfully created batch directory (absolute): {$batchPathAbsolute}");
+
+        $originalExtension = $uploadedFile->getClientOriginalExtension();
+        $inputTempFilename = Str::uuid() . '.' . $originalExtension;
+        $inputFileRelativePathOnDisk = $batchDirectoryRelative . '/' . $inputTempFilename;
+
+        Log::info("Storing uploaded file as '{$inputTempFilename}' to '{$inputFileRelativePathOnDisk}' on disk '{$this->processingDisk}'.");
+        $uploadedFile->storeAs($batchDirectoryRelative, $inputTempFilename, $this->processingDisk);
+        $inputFilePathAbsolute = Storage::disk($this->processingDisk)->path($inputFileRelativePathOnDisk);
+
+        if (!file_exists($inputFilePathAbsolute)) {
+            Log::error("Uploaded file FAILED to store/verify at: {$inputFilePathAbsolute}.");
+            $this->cleanupTempDirectoryOnDisk($batchDirectoryRelative, $this->processingDisk);
+            return back()->withErrors(['process_error' => "Error saving uploaded file."])->withInput();
+        }
+        Log::info("Uploaded file successfully stored at: {$inputFilePathAbsolute}");
+
+        $outputPythonFilename = Str::uuid() . '.pdf'; // Toto je NOVÉ PDF s obrátenými stranami
+        $outputFilePathAbsoluteByPython = $batchPathAbsolute . DIRECTORY_SEPARATOR . $outputPythonFilename;
+        Log::info("PHP expects Python to create reversed PDF at: {$outputFilePathAbsoluteByPython}");
+
+        $command = [
+            base_path(env('PYTHON_VENV_EXECUTABLE', 'python')),
+            base_path(env('PYTHON_SCRIPT_PATH', 'scripts/pdf_processor.py')),
+            "--operation", "reverse_pages",
+            "--input", $inputFilePathAbsolute,
+            "--output", $outputFilePathAbsoluteByPython,
+        ];
+
+        Log::info('Executing Python command for reverse_pages: ' . implode(' ', $command));
+        $result = Process::run($command);
+
+        Log::info("Python Process (reverse_pages) Ran. Successful: " . ($result->successful() ? 'Yes' : 'No') . ", Exit Code: " . $result->exitCode());
+        Log::info("Python STDOUT (reverse_pages): '" . trim($result->output()) . "'");
+        Log::info("Python STDERR (reverse_pages): '" . trim($result->errorOutput()) . "'");
+
+        if (!$result->successful()) {
+            $errorOutput = $result->errorOutput();
+            Log::error("Python script (reverse_pages) execution failed. Error: {$errorOutput}");
+            $this->cleanupTempDirectoryOnDisk($batchDirectoryRelative, $this->processingDisk);
+            return back()->withErrors(['process_error' => 'Failed to reverse PDF pages. Details: ' . $errorOutput])->withInput();
+        }
+        
+        $finalReversedFilePathAbsolute = "";
+        $pythonReturnedPath = trim($result->output());
+
+        if (!empty($pythonReturnedPath) && file_exists($pythonReturnedPath)) {
+            $finalReversedFilePathAbsolute = $pythonReturnedPath;
+            if ($pythonReturnedPath !== $outputFilePathAbsoluteByPython) {
+                Log::warning("Path from Python STDOUT ('{$pythonReturnedPath}') differs from PHP's expected output path ('{$outputFilePathAbsoluteByPython}'), but STDOUT path is valid. Using STDOUT path.");
+            }
+        } elseif (file_exists($outputFilePathAbsoluteByPython)) {
+            Log::warning("Python STDOUT was not a valid path or empty, but file exists at PHP's expected output path: '{$outputFilePathAbsoluteByPython}'. Using this path.");
+            $finalReversedFilePathAbsolute = $outputFilePathAbsoluteByPython;
+        } else {
+            Log::error("Reversed PDF file was not found. Python STDOUT: '{$pythonReturnedPath}', PHP Expected: '{$outputFilePathAbsoluteByPython}'");
+            $this->cleanupTempDirectoryOnDisk($batchDirectoryRelative, $this->processingDisk);
+            return back()->withErrors(['process_error' => 'Processing error: Could not retrieve reversed PDF.'])->withInput();
+        }
+        Log::info("Using final reversed PDF file (absolute path): {$finalReversedFilePathAbsolute}");
+
+        ActivityLogger::log("reverse_pages_inertia_success", "PDF pages reversed: {$outputNameForDownload}", $request->user());
+
+        $reversedFileRelativeOnDisk = str_replace(Storage::disk($this->processingDisk)->path(''), '', $finalReversedFilePathAbsolute);
+        $reversedFileRelativeOnDisk = ltrim($reversedFileRelativeOnDisk, DIRECTORY_SEPARATOR);
+
+        $downloadToken = Str::random(40);
+        session(['download_file_path_' . $downloadToken => $reversedFileRelativeOnDisk]);
+        session(['download_file_disk_' . $downloadToken => $this->processingDisk]);
+        session(['download_file_name_' . $downloadToken => $outputNameForDownload]);
+        $downloadUrl = route('file.download.temporary', ['token' => $downloadToken]);
+
+        Log::info("Generated download URL: {$downloadUrl} for reversed PDF '{$reversedFileRelativeOnDisk}' on disk '{$this->processingDisk}'.");
+
+        return Inertia::render('PdfTools/ReversePagesResult', [
+            'successMessage' => 'PDF pages reversed successfully!',
+            'downloadUrl' => $downloadUrl,
+            'fileName' => $outputNameForDownload,
+        ]);
+
+    } catch (\Throwable $e) {
+        Log::critical("Critical error during PDF reverse_pages: " . $e->getMessage(), ['exception' => $e]);
+        if (isset($batchDirectoryRelative)) {
+            $this->cleanupTempDirectoryOnDisk($batchDirectoryRelative, $this->processingDisk);
+        }
+        ActivityLogger::log("reverse_pages_inertia_CRITICAL_ERROR", "Exception: " . $e->getMessage(), $request->user());
+        return back()->withErrors(['process_error' => 'A critical error occurred. Please contact support.'])->withInput();
+    }
+}
+ public function showDuplicatePagesForm()
+    {
+        return Inertia::render('PdfTools/DuplicatePages');
+    }
+
+    public function processDuplicatePages(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'file' => ['required', 'file', 'mimes:pdf', 'max:50000'],
+            'pages' => ['required', 'string', 'regex:/^[0-9,\-\sA-Za-z]+$/'], // Umožní 'all'
+            'duplicate_count' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:100'],
+            'output_name' => ['sometimes', 'nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9_-]+$/'],
+        ]);
+
+        if ($validator->fails()) {
+            Log::error('Validation failed for PDF page duplication.', $validator->errors()->toArray());
+            return back()->withErrors($validator->errors())->withInput();
+        }
+
+        Log::info("PDF Duplicate Pages process started using disk '{$this->processingDisk}'.");
+
+        $uploadedFile = $request->file('file');
+        $pagesToDuplicate = $request->input('pages');
+        $pagesToDuplicateSanitized = $pagesToDuplicate ? preg_replace('/\s+/', '', $pagesToDuplicate) : 'all';
+        $duplicateCount = (int) $request->input('duplicate_count', 1); // Cast na int, default na 1
+
+        $outputNameForDownload = $request->input('output_name') ?? 'duplicated-pages-document';
+        if (!Str::endsWith($outputNameForDownload, '.pdf')) {
+            $outputNameForDownload .= '.pdf';
+        }
+        Log::info("Output PDF name (for download) set to: {$outputNameForDownload}");
+
+        $batchId = Str::uuid();
+        $batchDirectoryRelative = $batchId;
+        $batchPathAbsolute = Storage::disk($this->processingDisk)->path($batchDirectoryRelative);
+
+        Log::info("Batch directory (relative to disk '{$this->processingDisk}'): {$batchDirectoryRelative}");
+        Log::info("Batch path (absolute for Python): {$batchPathAbsolute}");
+
+        try {
+            if (!Storage::disk($this->processingDisk)->makeDirectory($batchDirectoryRelative)) {
+                Log::error("Storage::makeDirectory FAILED for: '{$batchDirectoryRelative}' on disk '{$this->processingDisk}'.");
+                return back()->withErrors(['process_error' => "System error: Could not create temporary directory."])->withInput();
+            }
+            Log::info("Successfully created batch directory (absolute): {$batchPathAbsolute}");
+
+            $originalExtension = $uploadedFile->getClientOriginalExtension();
+            $inputTempFilename = Str::uuid() . '.' . $originalExtension;
+            $inputFileRelativePathOnDisk = $batchDirectoryRelative . '/' . $inputTempFilename;
+
+            Log::info("Storing uploaded file as '{$inputTempFilename}' to '{$inputFileRelativePathOnDisk}' on disk '{$this->processingDisk}'.");
+            $uploadedFile->storeAs($batchDirectoryRelative, $inputTempFilename, $this->processingDisk);
+            $inputFilePathAbsolute = Storage::disk($this->processingDisk)->path($inputFileRelativePathOnDisk);
+
+            if (!file_exists($inputFilePathAbsolute)) {
+                Log::error("Uploaded file FAILED to store/verify at: {$inputFilePathAbsolute}.");
+                $this->cleanupTempDirectoryOnDisk($batchDirectoryRelative, $this->processingDisk);
+                return back()->withErrors(['process_error' => "Error saving uploaded file."])->withInput();
+            }
+            Log::info("Uploaded file successfully stored at: {$inputFilePathAbsolute}");
+
+            $outputPythonFilename = Str::uuid() . '.pdf';
+            $outputFilePathAbsoluteByPython = $batchPathAbsolute . DIRECTORY_SEPARATOR . $outputPythonFilename;
+            Log::info("PHP expects Python to create duplicated pages PDF at: {$outputFilePathAbsoluteByPython}");
+
+            $command = [
+                base_path(env('PYTHON_VENV_EXECUTABLE', 'python')),
+                base_path(env('PYTHON_SCRIPT_PATH', 'scripts/pdf_processor.py')),
+                "--operation", "duplicate_pages",
+                "--input", $inputFilePathAbsolute,
+                "--output", $outputFilePathAbsoluteByPython,
+                "--pages", $pagesToDuplicateSanitized,
+                "--duplicate-count", (string)$duplicateCount, // Python očakáva string
+            ];
+
+            Log::info('Executing Python command for duplicate_pages: ' . implode(' ', $command));
+            $result = Process::run($command);
+
+            Log::info("Python Process (duplicate_pages) Ran. Successful: " . ($result->successful() ? 'Yes' : 'No') . ", Exit Code: " . $result->exitCode());
+            Log::info("Python STDOUT (duplicate_pages): '" . trim($result->output()) . "'");
+            Log::info("Python STDERR (duplicate_pages): '" . trim($result->errorOutput()) . "'");
+
+            if (!$result->successful()) {
+                $errorOutput = $result->errorOutput();
+                Log::error("Python script (duplicate_pages) execution failed. Error: {$errorOutput}");
+                $this->cleanupTempDirectoryOnDisk($batchDirectoryRelative, $this->processingDisk);
+                return back()->withErrors(['process_error' => 'Failed to duplicate PDF pages. Details: ' . $errorOutput])->withInput();
+            }
+            
+            $finalProcessedFilePathAbsolute = "";
+            $pythonReturnedPath = trim($result->output());
+
+            if (!empty($pythonReturnedPath) && file_exists($pythonReturnedPath)) {
+                $finalProcessedFilePathAbsolute = $pythonReturnedPath;
+                if ($pythonReturnedPath !== $outputFilePathAbsoluteByPython) {
+                    Log::warning("Path from Python STDOUT ('{$pythonReturnedPath}') differs from PHP's expected output path ('{$outputFilePathAbsoluteByPython}'), but STDOUT path is valid. Using STDOUT path.");
+                }
+            } elseif (file_exists($outputFilePathAbsoluteByPython)) {
+                Log::warning("Python STDOUT was not a valid path or empty, but file exists at PHP's expected output path: '{$outputFilePathAbsoluteByPython}'. Using this path.");
+                $finalProcessedFilePathAbsolute = $outputFilePathAbsoluteByPython;
+            } else {
+                Log::error("Duplicated pages PDF file was not found. Python STDOUT: '{$pythonReturnedPath}', PHP Expected: '{$outputFilePathAbsoluteByPython}'");
+                $this->cleanupTempDirectoryOnDisk($batchDirectoryRelative, $this->processingDisk);
+                return back()->withErrors(['process_error' => 'Processing error: Could not retrieve duplicated pages PDF.'])->withInput();
+            }
+            Log::info("Using final duplicated pages PDF file (absolute path): {$finalProcessedFilePathAbsolute}");
+
+            ActivityLogger::log("duplicate_pages_inertia_success", "PDF pages duplicated: {$outputNameForDownload}", $request->user());
+
+            $processedFileRelativeOnDisk = str_replace(Storage::disk($this->processingDisk)->path(''), '', $finalProcessedFilePathAbsolute);
+            $processedFileRelativeOnDisk = ltrim($processedFileRelativeOnDisk, DIRECTORY_SEPARATOR);
+
+            $downloadToken = Str::random(40);
+            session(['download_file_path_' . $downloadToken => $processedFileRelativeOnDisk]);
+            session(['download_file_disk_' . $downloadToken => $this->processingDisk]);
+            session(['download_file_name_' . $downloadToken => $outputNameForDownload]);
+            $downloadUrl = route('file.download.temporary', ['token' => $downloadToken]);
+
+            Log::info("Generated download URL: {$downloadUrl} for duplicated pages PDF '{$processedFileRelativeOnDisk}' on disk '{$this->processingDisk}'.");
+
+            return Inertia::render('PdfTools/DuplicatePagesResult', [
+                'successMessage' => 'PDF pages duplicated successfully!',
+                'downloadUrl' => $downloadUrl,
+                'fileName' => $outputNameForDownload,
+            ]);
+
+        } catch (\Throwable $e) {
+            Log::critical("Critical error during PDF duplicate_pages: " . $e->getMessage(), ['exception' => $e]);
+            if (isset($batchDirectoryRelative)) {
+                $this->cleanupTempDirectoryOnDisk($batchDirectoryRelative, $this->processingDisk);
+            }
+            ActivityLogger::log("duplicate_pages_inertia_CRITICAL_ERROR", "Exception: " . $e->getMessage(), $request->user());
             return back()->withErrors(['process_error' => 'A critical error occurred. Please contact support.'])->withInput();
         }
     }

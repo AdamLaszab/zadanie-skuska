@@ -117,7 +117,7 @@ function submit() {
                   ref="overlayFileInput"
                   id="overlay_file"
                   type="file"
-                  accept=".pdf"
+                  accept=".pdf , .jpeg, .png"
                   @change="handleOverlayFileChange"
                   class="mt-1 block w-full text-sm text-gray-500 text-gray-500 dark:text-gray-400
                        file:mr-4 file:py-2 file:px-4
@@ -168,21 +168,7 @@ function submit() {
               </div>
 
 
-              <div>
-                <label for="output_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Output File Name (optional, without .pdf)
-                </label>
-                <input
-                  v-model="form.output_name"
-                  id="output_name"
-                  type="text"
-                  class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm 
-                         focus:border-sky-500 focus:ring-sky-500 sm:text-sm bg-white dark:bg-gray-700 
-                         text-gray-900 dark:text-gray-100"
-                  placeholder="overlaid-document"
-                />
-                <p v-if="form.errors.output_name" class="mt-1 text-xs text-red-500">{{ form.errors.output_name }}</p>
-              </div>
+            
 
               <div>
                 <button
