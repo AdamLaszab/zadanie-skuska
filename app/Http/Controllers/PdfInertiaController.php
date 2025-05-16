@@ -968,7 +968,7 @@ public function showOverlayForm()
                 base_path(env('PYTHON_VENV_EXECUTABLE', 'python')),
                 base_path(env('PYTHON_SCRIPT_PATH', 'scripts/pdf_processor.py')),
                 "--operation", "overlay",
-                "--main-pdf", $mainFilePathAbsolute, // Alebo --input, podľa vášho argparse
+                "--input", $mainFilePathAbsolute, // Alebo --input, podľa vášho argparse
                 "--overlay-pdf", $overlayFilePathAbsolute,
                 "--output", $outputFilePathAbsoluteByPython,
                 "--overlay-page-number", (string)$overlayPageNumber,
