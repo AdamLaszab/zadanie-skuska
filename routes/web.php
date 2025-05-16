@@ -7,20 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PdfInertiaController;
 use App\Http\Controllers\FileDownloadController;
 use App\Http\Controllers\FileTestController;
-
-// Route::get('/', function () {
-//     return Inertia::render('Welcome');
-// })->name('home');
-
-// Route::get('dashboard', function () {
-//     return Inertia::render('Dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
-
-// Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function() {
-//     Route::get('/logs', [ActivityLogController::class, 'index'])->name('logs.index');
-//     Route::get('/logs/export', [ActivityLogController::class, 'export'])->name('logs.export');
-//     Route::delete('/logs', [ActivityLogController::class, 'clear'])->name('logs.clear');
-// });
+use App\Http\Controllers\UserController;
 
 Route::redirect('/', '/login');
 
@@ -29,14 +16,13 @@ Route::post('/login', [AuthController::class, 'storeLogin']);
 Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/register', [AuthController::class, 'storeRegister']);
 
-Route::middleware('auth')->group(function () {
-    Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::middleware(['auth', 'permission:use-pdf-tools'])->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/tools/pdf/merge', [PdfInertiaController::class, 'showMergeForm'])->name('pdf.tool.merge.show');
     Route::post('/tools/pdf/merge', [PdfInertiaController::class, 'processMerge'])->name('pdf.tool.merge.process');
 
-    // Routa na sťahovanie dočasných súborov
     Route::get('/download/temporary/{token}', [FileDownloadController::class, 'downloadTemporaryFile'])->name('file.download.temporary');
 
     Route::get('/file-test', [FileTestController::class, 'showForm'])->name('file.test');
@@ -59,6 +45,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/tools/pdf/reverse-pages', [PdfInertiaController::class, 'processReversePages'])->name('pdf.tool.reverse_pages.process');
     Route::get('/tools/pdf/duplicate-pages', [PdfInertiaController::class, 'showDuplicatePagesForm'])->name('pdf.tool.duplicate_pages.show');
     Route::post('/tools/pdf/duplicate-pages', [PdfInertiaController::class, 'processDuplicatePages'])->name('pdf.tool.duplicate_pages.process');
+});
+
+Route::middleware(['auth', 'permission:view-users'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/users', [UserController::class, 'index'])->name('users');
 });
 
 

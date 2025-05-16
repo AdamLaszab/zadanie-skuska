@@ -2,32 +2,48 @@
 <script lang="ts" setup>
 import NavMain from '@/components/created/NavMain.vue';
 import type { NavItem } from '@/types';
-import { route } from 'ziggy-js'; 
+import { usePage } from '@inertiajs/vue3';
+import { route } from 'ziggy-js';
 
+const page = usePage();
+
+const can = (perm: string): boolean => {
+    return Array.isArray(page.props.auth?.permissions) && page.props.auth.permissions.includes(perm);
+};
+
+const is = (role: string): boolean => {
+    return Array.isArray(page.props.auth?.roles) && page.props.auth.roles.includes(role);
+};
+console.log(page.props.auth);
 const defaultNavigationItems: NavItem[] = [
-    { label: 'Dashboard', href: route('dashboard') },
-    { label: 'Settings' , href: route('dashboard') },
-    // { label: 'Extract Pages', href: route('pdf.tool.extract_pages.show') },
-    // { label: 'Rotate PDF', href: route('pdf.tool.rotate.show') },
-    // { label: 'Delete Pages', href: route('pdf.tool.delete_pages.show') },
-    // { label: 'Encrypt PDF', href: route('pdf.tool.encrypt.show') },
-    // { label: 'Decrypt PDF', href: route('pdf.tool.decrypt.show') },
-    // { label: 'Overlay PDF', href: route('pdf.tool.overlay.show') },
-
+    {
+        label: 'Dashboard',
+        href: route('dashboard'),
+        visible: can('use-pdf-tools'),
+    },
+    {
+        label: 'Settings',
+        href: route('dashboard'),
+        visible: is('user'), //
+    },
+    {
+        label: 'User List',
+        href: route('admin.users'),
+        visible: can('view-users'),
+    },
 ];
-
+//console.log(defaultNavigationItems);
+const navigationItems = defaultNavigationItems.filter((item) => item.visible !== false);
 </script>
 
 <template>
-  <div class="flex min-h-screen max-h-screen overflow-hidden bg-sky-50">
+    <div class="flex max-h-screen min-h-screen overflow-hidden bg-sky-50">
+        <NavMain :items="navigationItems" class="h-screen flex-shrink-0" />
 
-    <NavMain :items="defaultNavigationItems" class="h-screen flex-shrink-0" />
-
-    <main class="flex-1 overflow-y-auto p-6 sm:p-8 md:p-10">
-      <div class="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-6 sm:p-8 border border-sky-100 dark:border-gray-700 min-h-full">
-        <slot />
-      </div>
-    </main>
-    
-  </div>
+        <main class="flex-1 overflow-y-auto p-6 sm:p-8 md:p-10">
+            <div class="min-h-full rounded-2xl border border-sky-100 bg-white p-6 shadow-xl sm:p-8 dark:border-gray-700 dark:bg-gray-800">
+                <slot />
+            </div>
+        </main>
+    </div>
 </template>

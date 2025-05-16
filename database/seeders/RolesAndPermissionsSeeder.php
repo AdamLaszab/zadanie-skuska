@@ -9,10 +9,9 @@ use App\Models\User;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
-    public function run()
+public function run()
     {
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
-
+        // Define all permissions
         $permissions = [
             'use-pdf-tools',
             'view-own-usage-history',
@@ -22,19 +21,23 @@ class RolesAndPermissionsSeeder extends Seeder
             'view-users',
         ];
 
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
+        // Create permissions
+        foreach ($permissions as $name) {
+            Permission::firstOrCreate(['name' => $name]);
         }
 
+        // Create roles
+        $adminRole = Role::firstOrCreate(['name' => 'admin']);
         $userRole = Role::firstOrCreate(['name' => 'user']);
-        $userRole->givePermissionTo([
+
+        // Assign permissions to roles
+        $adminRole->syncPermissions($permissions); // All permissions
+        $userRole->syncPermissions([
             'use-pdf-tools',
             'view-own-usage-history',
         ]);
 
-        $adminRole = Role::firstOrCreate(['name' => 'admin']);
-        $adminRole->givePermissionTo(Permission::all()); 
-
+        // Create users
         $adminUser = User::firstOrCreate(
             ['email' => 'admin@example.com'],
             [
@@ -56,5 +59,7 @@ class RolesAndPermissionsSeeder extends Seeder
             ]
         );
         $regularUser->assignRole($userRole);
+        dd($userRole);
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
     }
 }

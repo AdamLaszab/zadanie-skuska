@@ -10,6 +10,7 @@ class AuthController
 {
     public function dashboard(Request $request)
     {
+        dd(Auth::user());
         return Inertia::render('Dashboard');
     }
 
