@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'; // Odstránil som watch
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
-import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
 
 const page = usePage();
 
@@ -54,7 +54,7 @@ function submit() {
 </script>
 
 <template>
-  <AuthenticatedLayout>
+  <DashboardLayout>
     <Head title="Encrypt PDF" />
 
     <div class="py-12">
@@ -145,5 +145,5 @@ function submit() {
         </div>
       </div>
     </div>
-  </AuthenticatedLayout>
+  </DashboardLayout>
 </template>

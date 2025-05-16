@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
 
 const props = defineProps<{
     successMessage?: string;
@@ -11,7 +11,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <AuthenticatedLayout>
+  <DashboardLayout>
     <Head title="Rotate PDF Result" />
 
     <div class="py-12">
@@ -50,5 +50,5 @@ const props = defineProps<{
         </div>
       </div>
     </div>
-  </AuthenticatedLayout>
+  </DashboardLayout>
 </template>

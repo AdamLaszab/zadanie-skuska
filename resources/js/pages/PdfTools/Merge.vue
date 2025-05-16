@@ -2,6 +2,8 @@
 import { ref, computed } from 'vue'; // Pridal som computed
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
+
 
 // Nie je potrebné importovať PageProps, ak je správne augmentovaný v globálnom .d.ts
 // Ak nie, museli by ste: import type { PageProps } from '@/types'; (alebo vaša cesta)
@@ -59,7 +61,7 @@ function submit() {
 </script>
 
 <template>
-  <AuthenticatedLayout>
+  <DashboardLayout>
     <Head title="Merge PDFs" />
 
     <div class="py-12">
@@ -145,5 +147,5 @@ function submit() {
         </div>
       </div>
     </div>
-  </AuthenticatedLayout>
+  </DashboardLayout>
 </template>
