@@ -6,7 +6,7 @@ use App\Http\Controllers\PdfApiController;
 use App\Http\Controllers\ApiKeyController;
 
 
-Route::prefix('pdf')->name('pdf.')->group(function () {
+Route::middleware(['validate.api'])->prefix('pdf')->name('pdf.')->group(function () {
     Route::post('/merge', [PdfApiController::class, 'merge'])->name('merge');
     Route::post('/rotate', [PdfApiController::class, 'rotate'])->name('rotate');
     Route::post('/delete-pages', [PdfApiController::class, 'deletePages'])->name('deletePages');

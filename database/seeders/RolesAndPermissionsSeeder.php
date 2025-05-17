@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Models\User; 
+use App\Services\ApiKeyService;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
@@ -31,7 +32,7 @@ public function run()
         $userRole = Role::firstOrCreate(['name' => 'user']);
 
         // Assign permissions to roles
-        $adminRole->syncPermissions($permissions); // All permissions
+        $adminRole->syncPermissions($permissions);
         $userRole->syncPermissions([
             'use-pdf-tools',
             'view-own-usage-history',
@@ -48,7 +49,7 @@ public function run()
             ]
         );
         $adminUser->assignRole($adminRole);
-
+        app(ApiKeyService::class)->generate($adminUser);
         $regularUser = User::firstOrCreate(
             ['email' => 'user@example.com'],
             [
@@ -59,7 +60,7 @@ public function run()
             ]
         );
         $regularUser->assignRole($userRole);
-        dd($userRole);
+        app(ApiKeyService::class)->generate($regularUser);
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
     }
 }

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\ApiKeyController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PdfInertiaController;
 use App\Http\Controllers\FileDownloadController;
@@ -15,6 +16,14 @@ Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/login', [AuthController::class, 'storeLogin']);
 Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/register', [AuthController::class, 'storeRegister']);
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [UserController::class, 'index'])->name('profile');
+    Route::put('/profile', [UserController::class, 'index']);
+    Route::post('/api-key/regenerate', [ApiKeyController::class, 'newApiKeyInertia'])->name('api.key.regenerate');
+});
+
+
 
 Route::middleware(['auth', 'permission:use-pdf-tools'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -51,6 +60,4 @@ Route::middleware(['auth', 'permission:view-users'])->prefix('admin')->name('adm
     Route::get('/users', [UserController::class, 'index'])->name('users');
 });
 
-
-require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

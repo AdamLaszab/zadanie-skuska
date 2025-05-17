@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,20 +23,57 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $permissions = [
+            'use-pdf-tools',
+            'view-own-usage-history',
+            'view-any-usage-history',
+            'export-any-usage-history',
+            'delete-any-usage-history',
+            'view-users',
+        ];
+
+        // Create permissions
+        foreach ($permissions as $name) {
+            Permission::firstOrCreate(['name' => $name]);
+        }
+
+        // Create roles
+        $adminRole = Role::firstOrCreate(['name' => 'admin']);
+        $userRole = Role::firstOrCreate(['name' => 'user']);
+
+        // Assign permissions to roles
+        $adminRole->syncPermissions($permissions);
+        $userRole->syncPermissions([
+            'use-pdf-tools',
+            'view-own-usage-history',
+        ]);
+
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
         Inertia::share([
-            'auth' => function () {
-                $user = Auth::user();
-                dd($user);
-                return [
-                    'user' => $user,
-                    'roles' => $user ? $user->getRoleNames() : [],
-                    'permissions' => $user
-                        ? $user->getPermissionsViaRoles()->pluck('name')->merge(
-                            $user->permissions->pluck('name')
-                        )->unique()->values()
-                        : [],
-                ];
-            },
+            'auth' => fn () => [
+                'user' => Auth::user(),
+            ],
+            'canUsePdfTools' => fn () =>
+                Auth::check() && Auth::user()->can('use-pdf-tools'),
+
+            'canViewUsers' => fn () =>
+                Auth::check() && Auth::user()->can('view-users'),
+
+            'canViewOwnHistory' => fn () =>
+                Auth::check() && Auth::user()->can('view-own-usage-history'),
+
+            'canViewAnyHistory' => fn () =>
+                Auth::check() && Auth::user()->can('view-any-usage-history'),
+
+            'canExportHistory' => fn () =>
+                Auth::check() && Auth::user()->can('export-any-usage-history'),
+
+            'canDeleteHistory' => fn () =>
+                Auth::check() && Auth::user()->can('delete-any-usage-history'),
+
+            'isAdmin' => fn () =>
+                Auth::check() && Auth::user()->hasRole('admin'),
         ]);
     }
 }

@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use App\Services\ApiKeyService;
 
 class AuthController
 {
     public function dashboard(Request $request)
     {
-        dd(Auth::user());
         return Inertia::render('Dashboard');
     }
 
@@ -73,7 +73,7 @@ class AuthController
             'created_at' => now(),
         ]);
         $user->assignRole('user');
-        
+        app(ApiKeyService::class)->generate($user);
         Auth::login($user);
         $request->session()->regenerate(); 
         

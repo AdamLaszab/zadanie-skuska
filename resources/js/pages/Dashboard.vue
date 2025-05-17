@@ -102,7 +102,7 @@ const pdfTools: PdfToolCard[] = [
                 Welcome to PDF Tools
             </h1>
             <p v-if="user" class="text-lg text-gray-600 dark:text-gray-400 mt-1">
-                Hello, {{ user.name }}! Ready to manage your PDFs?
+                Hello, {{ page.props.auth.user.first_name + ' ' + page.props.auth.user.last_name}}! Ready to manage your PDFs?
             </p>
         </div>
 

@@ -1,4 +1,3 @@
-// src/layouts/DashboardLayout.vue
 <script lang="ts" setup>
 import NavMain from '@/components/created/NavMain.vue';
 import type { NavItem } from '@/types';
@@ -8,32 +7,39 @@ import { route } from 'ziggy-js';
 const page = usePage();
 
 const can = (perm: string): boolean => {
-    return Array.isArray(page.props.auth?.permissions) && page.props.auth.permissions.includes(perm);
+    const map = {
+        'use-pdf-tools': page.props.canUsePdfTools,
+        'view-users': page.props.canViewUsers,
+        'view-own-usage-history': page.props.canViewOwnHistory,
+        'view-any-usage-history': page.props.canViewAnyHistory,
+        'export-any-usage-history': page.props.canExportHistory,
+        'delete-any-usage-history': page.props.canDeleteHistory,
+    };
+
+    return map[perm] === true;
 };
 
 const is = (role: string): boolean => {
-    return Array.isArray(page.props.auth?.roles) && page.props.auth.roles.includes(role);
+    const map = {
+        admin: page.props.isAdmin,
+        user: page.props.auth?.user?.username === 'regular', // example fallback
+    };
+
+    return map[role] === true;
 };
-console.log(page.props.auth);
-const defaultNavigationItems: NavItem[] = [
-    {
-        label: 'Dashboard',
-        href: route('dashboard'),
-        visible: can('use-pdf-tools'),
-    },
-    {
-        label: 'Settings',
-        href: route('dashboard'),
-        visible: is('user'), //
-    },
-    {
-        label: 'User List',
-        href: route('admin.users'),
-        visible: can('view-users'),
-    },
+
+const navItems: NavItem[] = [
+    { label: 'Dashboard', href: route('dashboard'), permission: 'use-pdf-tools' },
+    { label: 'Profile', href: route('profile'), permission: 'use-pdf-tools' },
+    // { label: 'User List', href: route('admin.users'), permission: 'view-users' },
+    // { label: 'Admin Panel', href: route('admin.logs.index'), role: 'admin' },
 ];
-//console.log(defaultNavigationItems);
-const navigationItems = defaultNavigationItems.filter((item) => item.visible !== false);
+
+const navigationItems = navItems.filter((item) => {
+    if (item.permission) return can(item.permission);
+    if (item.role) return is(item.role);
+    return true; 
+});
 </script>
 
 <template>
