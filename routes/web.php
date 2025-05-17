@@ -17,7 +17,7 @@ Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/register', [AuthController::class, 'storeRegister']);
 
 Route::middleware(['auth', 'permission:use-pdf-tools'])->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/tools/pdf/merge', [PdfInertiaController::class, 'showMergeForm'])->name('pdf.tool.merge.show');
@@ -25,8 +25,6 @@ Route::middleware(['auth', 'permission:use-pdf-tools'])->group(function () {
 
     Route::get('/download/temporary/{token}', [FileDownloadController::class, 'downloadTemporaryFile'])->name('file.download.temporary');
 
-    Route::get('/file-test', [FileTestController::class, 'showForm'])->name('file.test');
-    Route::post('/file-test', [FileTestController::class, 'processUpload'])->name('file.test.upload');
     Route::get('/tools/pdf/extract-pages', [PdfInertiaController::class, 'showExtractPagesForm'])->name('pdf.tool.extract_pages.show');
     Route::post('/tools/pdf/extract-pages', [PdfInertiaController::class, 'processExtractPages'])->name('pdf.tool.extract_pages.process');
     Route::get('/tools/pdf/rotate', [PdfInertiaController::class, 'showRotateForm'])->name('pdf.tool.rotate.show');
@@ -51,6 +49,12 @@ Route::middleware(['auth', 'permission:view-users'])->prefix('admin')->name('adm
     Route::get('/users', [UserController::class, 'index'])->name('users');
 });
 
+Route::middleware(['auth', 'permission:view-any-usage-history'])->prefix('admin')->name('admin.')->group(function () {
+     Route::get('/logs', [ActivityLogController::class, 'index'])->name('logs.index');
 
+    Route::get('/logs/export', [ActivityLogController::class, 'export'])->name('logs.export');
+
+    Route::delete('/logs/clear', [ActivityLogController::class, 'clear'])->name('logs.clear');
+});
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

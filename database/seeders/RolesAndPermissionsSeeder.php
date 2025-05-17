@@ -59,7 +59,6 @@ public function run()
             ]
         );
         $regularUser->assignRole($userRole);
-        dd($userRole);
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
     }
 }
