@@ -11,6 +11,7 @@ export interface User {
     // Export je tu v poriadku, ak ho chcete importovať inde
     id: number;
     name: string;
+    username: string;
     email: string;
     avatar?: string;
     email_verified_at: string | null;
@@ -35,6 +36,7 @@ export type NavItem = {
     href: string;
     permission?: string;
     role?: string;
+    icon?: string;
 };
 
 declare module '@inertiajs/core' {

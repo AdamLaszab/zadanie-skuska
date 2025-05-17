@@ -32,6 +32,7 @@ const navItems: NavItem[] = [
     { label: 'Dashboard', href: route('dashboard'), permission: 'use-pdf-tools' },
     { label: 'Profile', href: route('profile'), permission: 'use-pdf-tools' },
     { label: 'History', href: route('admin.logs.index'), permission: 'view-users' },
+    { label: 'Manual', href: route('manual.show'), permission: 'use-pdf-tools' }
     // { label: 'User List', href: route('admin.users'), permission: 'view-users' },
     // { label: 'Admin Panel', href: route('admin.logs.index'), role: 'admin' },
 ];
@@ -48,9 +49,10 @@ const navigationItems = navItems.filter((item) => {
         <NavMain :items="navigationItems" class="h-screen flex-shrink-0" />
 
         <main class="flex-1 overflow-y-auto p-6 sm:p-8 md:p-10">
-            <div class="min-h-full rounded-2xl border border-sky-100 bg-white p-6 shadow-xl sm:p-8 dark:border-gray-700 dark:bg-gray-800">
+            <div class="min-h-full rounded-2xl border border-sky-100 bg-white p-6 sm:p-8 dark:border-gray-700 dark:bg-gray-800">
                 <slot />
             </div>
+            <!-- <slot /> -->
         </main>
     </div>
 </template>

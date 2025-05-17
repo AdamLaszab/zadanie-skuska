@@ -9,6 +9,7 @@ use App\Http\Controllers\PdfInertiaController;
 use App\Http\Controllers\FileDownloadController;
 use App\Http\Controllers\FileTestController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ManualController;
 
 Route::redirect('/', '/login');
 
@@ -21,6 +22,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [UserController::class, 'index'])->name('profile');
     Route::put('/profile', [UserController::class, 'index']);
     Route::post('/api-key/regenerate', [ApiKeyController::class, 'newApiKeyInertia'])->name('api.key.regenerate');
+    Route::get('/manual', [ManualController::class, 'show'])->name('manual.show');
+    Route::get('/manual/export-pdf', [ManualController::class, 'exportPdf'])->name('manual.export.pdf');
 });
 
 
@@ -51,7 +54,7 @@ Route::middleware(['auth', 'permission:use-pdf-tools'])->group(function () {
     Route::get('/tools/pdf/reverse-pages', [PdfInertiaController::class, 'showReversePagesForm'])->name('pdf.tool.reverse_pages.show');
     Route::post('/tools/pdf/reverse-pages', [PdfInertiaController::class, 'processReversePages'])->name('pdf.tool.reverse_pages.process');
     Route::get('/tools/pdf/duplicate-pages', [PdfInertiaController::class, 'showDuplicatePagesForm'])->name('pdf.tool.duplicate_pages.show');
-    Route::post('/tools/pdf/duplicate-pages', [PdfInertiaController::class, 'processDuplicatePages'])->name('pdf.tool.duplicate_pages.process');
+    Route::post('/tools/pdf/duplicate-pages', [PdfInertiaController::class, 'processDuplicatePages'])->name('pdf.tool.duplicate_pages.process');    
 });
 
 Route::middleware(['auth', 'permission:view-users'])->prefix('admin')->name('admin.')->group(function () {

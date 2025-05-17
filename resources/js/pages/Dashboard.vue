@@ -97,16 +97,16 @@ const pdfTools: PdfToolCard[] = [
     <DashboardLayout>
         <Head title="Dashboard" />
 
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">
-                Welcome to PDF Tools
+        <!-- <div class="mb-8">
+            <h1 v-if="user" class="text-3xl font-bold text-gray-800 dark:text-gray-100">
+                Welcome {{ page.props.auth.user.first_name + ' ' + page.props.auth.user.last_name}}!
             </h1>
             <p v-if="user" class="text-lg text-gray-600 dark:text-gray-400 mt-1">
                 Hello, {{ page.props.auth.user.first_name + ' ' + page.props.auth.user.last_name}}! Ready to manage your PDFs?
             </p>
-        </div>
+        </div> -->
 
-        <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-200 mb-6">Available Tools</h2>
+        <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-200 mb-6 text-center">Available Tools</h2>
 
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             <Link
