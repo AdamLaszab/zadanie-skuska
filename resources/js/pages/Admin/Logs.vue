@@ -4,7 +4,7 @@ import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue';
 import { computed, ref } from 'vue';
 import { format, parseISO, isValid as isDateValid } from 'date-fns';
 import ConfirmationModal from '@/components/ConfirmationModal.vue'; // Ensure path is correct
-
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
 // Import useToast from vue-toastification
 import { useToast } from 'vue-toastification';
 
@@ -134,7 +134,7 @@ function handleClearLogsCancel() {
 </script>
 
 <template>
-    <AuthenticatedLayout>
+    <DashboardLayout>
         <Head title="Activity Logs - Admin" />
 
         <template #header>
@@ -260,5 +260,5 @@ function handleClearLogsCancel() {
             @confirm="handleClearLogsConfirm"
             @cancel="handleClearLogsCancel"
         />
-    </AuthenticatedLayout>
+    </DashboardLayout>
 </template>

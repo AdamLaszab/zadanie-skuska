@@ -59,11 +59,10 @@ Route::middleware(['auth', 'permission:view-users'])->prefix('admin')->name('adm
 });
 
 Route::middleware(['auth', 'permission:view-any-usage-history'])->prefix('admin')->name('admin.')->group(function () {
-     Route::get('/logs', [ActivityLogController::class, 'index'])->name('logs.index');
+    Route::get('/logs', [ActivityLogController::class, 'index'])->name('logs.index');
 
     Route::get('/logs/export', [ActivityLogController::class, 'export'])->name('logs.export');
 
     Route::delete('/logs/clear', [ActivityLogController::class, 'clear'])->name('logs.clear');
 });
-require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

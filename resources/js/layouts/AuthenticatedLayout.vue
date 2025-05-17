@@ -31,8 +31,8 @@ const navigation = [
 ];
 
 const userNavigation = [
-    { name: 'Your Profile', href: route('profile.edit'), method: 'get' }, // Predpoklad routy pre profil
-    { name: 'Sign out', href: route('logout'), method: 'post' },
+    // { name: 'Your Profile', href: route('profile.edit'), method: 'get' }, // Predpoklad routy pre profil
+    // { name: 'Sign out', href: route('logout'), method: 'post' },
 ];
 </script>
 
@@ -96,7 +96,7 @@ const userNavigation = [
                                     </template>
 
                                     <template #content>
-                                        <DropdownLink :href="route('profile.edit')"> Profile </DropdownLink>
+                                        <!-- <DropdownLink :href="route('profile.edit')"> Profile </DropdownLink> -->
                                         <DropdownLink :href="route('logout')" method="post" as="button">
                                             Log Out
                                         </DropdownLink>
@@ -164,7 +164,7 @@ const userNavigation = [
                         </div>
 
                         <div class="mt-3 space-y-1">
-                            <ResponsiveNavLink :href="route('profile.edit')"> Profile </ResponsiveNavLink>
+                            <!-- <ResponsiveNavLink :href="route('profile.edit')"> Profile </ResponsiveNavLink> -->
                             <ResponsiveNavLink :href="route('logout')" method="post" as="button">
                                 Log Out
                             </ResponsiveNavLink>
