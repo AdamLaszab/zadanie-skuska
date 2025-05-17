@@ -29,7 +29,7 @@ defineProps<{
     <div class="mt-auto">
        <Link
           href="/logout"
-          method="post"
+          method="get"
           as="button"
           class="w-full text-left px-4 py-3 rounded-md text-sky-200 hover:bg-red-500 hover:text-white transition duration-150 ease-in-out"
         >
