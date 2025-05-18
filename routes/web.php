@@ -19,8 +19,9 @@ Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/register', [AuthController::class, 'storeRegister']);
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/profile', [UserController::class, 'index'])->name('profile');
-    Route::put('/profile', [UserController::class, 'index']);
+    Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+    Route::put('/profile', [UserController::class, 'update']);
+    Route::put('/profile/password', [UserController::class, 'updatePassword'])->name('profile.password');
     Route::post('/api-key/regenerate', [ApiKeyController::class, 'newApiKeyInertia'])->name('api.key.regenerate');
     Route::get('/manual', [ManualController::class, 'show'])->name('manual.show');
     Route::get('/manual/export-pdf', [ManualController::class, 'exportPdf'])->name('manual.export.pdf');
@@ -59,8 +60,8 @@ Route::middleware(['auth', 'permission:use-pdf-tools'])->group(function () {
 
 Route::middleware(['auth', 'permission:view-users'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('users');
+    Route::put('/users/{user}/role', [UserController::class, 'updateRole'])->name('users.updateRole');
 });
-
 Route::middleware(['auth', 'permission:view-any-usage-history'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/logs', [ActivityLogController::class, 'index'])->name('logs.index');
 

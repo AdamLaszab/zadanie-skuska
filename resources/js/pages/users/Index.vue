@@ -1,89 +1,91 @@
 <script setup lang="ts">
+import { useForm } from '@inertiajs/vue3';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
-import { router, useForm, usePage } from '@inertiajs/vue3';
-import { ref } from 'vue';
 
 const props = defineProps<{
-    user: {
-        first_name: string;
-        last_name: string;
-        email: string;
-        api_key?: string;
-    };
+  users: Array<{
+    id: number;
+    username: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+    roles: Array<{ name: string }>;
+  }>;
+  allRoles: string[];
 }>();
 
-const page = usePage();
-const form = useForm({
-    first_name: props.user.first_name,
-    last_name: props.user.last_name,
-    email: props.user.email,
-});
-
-const success = ref(false);
-const apiKey = ref('');
-
-const regenerateKey = () => {
-    router.post(
-        route('api.key.regenerate'),
-        {},
-        {
-            preserveScroll: true,
-            onSuccess: (response) => {
-                if (response?.props?.user?.api_key) {
-                    apiKey.value = response.props.user.api_key;
-                    success.value = true;
-                }
-            },
-        },
-    );
-};
+const forms = props.users.reduce((acc, user) => {
+  acc[user.id] = useForm({
+    role: user.roles[0]?.name || '',
+  });
+  return acc;
+}, {} as Record<number, ReturnType<typeof useForm>>);
 </script>
 
 <template>
-    <DashboardLayout>
-        <div>
-            <h1 class="mb-6 text-2xl font-bold text-sky-800">My Profile</h1>
+  <DashboardLayout>
+    <div class="px-4 sm:px-6 lg:px-8 py-6 max-w-full">
+      <div class="flex items-center justify-start mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">Users</h1>
+      </div>
 
-            <form @submit.prevent="form.put(route('profile'))" class="space-y-4 rounded-lg border border-sky-100 bg-white p-6 shadow">
-                <div>
-                    <label class="mb-1 block text-sm font-medium">First Name</label>
-                    <input v-model="form.first_name" type="text" class="w-full rounded border border-gray-300 p-2" />
-                    <p v-if="form.errors.first_name" class="text-sm text-red-500">{{ form.errors.first_name }}</p>
-                </div>
-
-                <div>
-                    <label class="mb-1 block text-sm font-medium">Last Name</label>
-                    <input v-model="form.last_name" type="text" class="w-full rounded border border-gray-300 p-2" />
-                    <p v-if="form.errors.last_name" class="text-sm text-red-500">{{ form.errors.last_name }}</p>
-                </div>
-
-                <div>
-                    <label class="mb-1 block text-sm font-medium">Email</label>
-                    <input v-model="form.email" type="email" class="w-full rounded border border-gray-300 p-2" />
-                    <p v-if="form.errors.email" class="text-sm text-red-500">{{ form.errors.email }}</p>
-                </div>
-
-                <div class="flex justify-end pt-4">
-                    <button :disabled="form.processing" type="submit" class="w-full rounded bg-sky-700 px-4 py-2 text-white hover:bg-sky-800">
-                        Save Changes
-                    </button>
-                </div>
-
-                <div class="mt-10 border-t pt-6">
-                    <h2 class="mb-4 text-lg font-semibold text-sky-800">API Access</h2>
-
-                    <form @submit.prevent="regenerateKey">
-                        <button class="w-full rounded bg-sky-600 px-4 py-2 text-white hover:bg-sky-700">Regenerate API Key</button>
-                    </form>
-
-                    <div v-if="success" class="mt-4 rounded bg-gray-100 p-3 text-sm text-gray-800">
-                        <p>
-                            <strong>Your new API key: </strong><span class="font-mono break-all">{{ apiKey }}</span>
-                        </p>
-                        <p class="text-red-600">⚠️ Copy it now — you won't see it again.</p>
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gradient-to-r from-sky-50 to-sky-100">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Name</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Username</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Email</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Role</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Action</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-for="user in props.users" :key="user.id" class="hover:bg-sky-50 transition-colors duration-150">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="h-8 w-8 rounded-full bg-sky-100 flex items-center justify-center text-sky-600 font-medium">
+                      {{ user.first_name[0] }}{{ user.last_name[0] }}
                     </div>
-                </div>
-            </form>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">{{ user.first_name }} {{ user.last_name }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  {{ user.username }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  {{ user.email }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <select 
+                    v-model="forms[user.id].role" 
+                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm rounded-md"
+                  >
+                    <option v-for="role in props.allRoles" :key="role" :value="role">{{ role }}</option>
+                  </select>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <button
+                    class="bg-sky-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-colors duration-150"
+                    @click="forms[user.id].put(route('admin.users.updateRole', user.id))"
+                    :disabled="forms[user.id].processing"
+                  >
+                    <span v-if="forms[user.id].processing">
+                      Updating...
+                    </span>
+                    <span v-else>
+                      Update
+                    </span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-    </DashboardLayout>
+      </div>
+    </div>
+  </DashboardLayout>
 </template>

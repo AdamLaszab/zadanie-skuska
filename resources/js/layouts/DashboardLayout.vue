@@ -31,9 +31,9 @@ const is = (role: string): boolean => {
 const navItems: NavItem[] = [
     { label: 'Dashboard', href: route('dashboard'), permission: 'use-pdf-tools' },
     { label: 'Profile', href: route('profile'), permission: 'use-pdf-tools' },
-    { label: 'History', href: route('admin.logs.index'), permission: 'view-users' },
+    { label: 'Activity', href: route('admin.logs.index'), permission: 'view-users' },
     { label: 'Manual', href: route('manual.show'), permission: 'use-pdf-tools' }
-    // { label: 'User List', href: route('admin.users'), permission: 'view-users' },
+    { label: 'User List', href: route('admin.users'), permission: 'view-users' },
     // { label: 'Admin Panel', href: route('admin.logs.index'), role: 'admin' },
 ];
 
