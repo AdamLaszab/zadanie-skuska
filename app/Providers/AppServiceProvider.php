@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Schema;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,57 +24,52 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $permissions = [
-            'use-pdf-tools',
-            'view-own-usage-history',
-            'view-any-usage-history',
-            'export-any-usage-history',
-            'delete-any-usage-history',
-            'view-users',
-        ];
+        if (Schema::hasTable('permissions') && Schema::hasTable('roles')) {
+            $permissions = [
+                'use-pdf-tools',
+                'view-own-usage-history',
+                'view-any-usage-history',
+                'export-any-usage-history',
+                'delete-any-usage-history',
+                'view-users',
+            ];
 
-        // Create permissions
-        foreach ($permissions as $name) {
-            Permission::firstOrCreate(['name' => $name]);
+            // Create permissions
+            foreach ($permissions as $name) {
+                Permission::firstOrCreate(['name' => $name]);
+            }
+
+            // Create roles
+            $adminRole = Role::firstOrCreate(['name' => 'admin']);
+            $userRole = Role::firstOrCreate(['name' => 'user']);
+
+            app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+            Inertia::share([
+                'auth' => fn () => [
+                    'user' => Auth::user(),
+                ],
+                'canUsePdfTools' => fn () =>
+                    Auth::check() && Auth::user()->can('use-pdf-tools'),
+
+                'canViewUsers' => fn () =>
+                    Auth::check() && Auth::user()->can('view-users'),
+
+                'canViewOwnHistory' => fn () =>
+                    Auth::check() && Auth::user()->can('view-own-usage-history'),
+
+                'canViewAnyHistory' => fn () =>
+                    Auth::check() && Auth::user()->can('view-any-usage-history'),
+
+                'canExportHistory' => fn () =>
+                    Auth::check() && Auth::user()->can('export-any-usage-history'),
+
+                'canDeleteHistory' => fn () =>
+                    Auth::check() && Auth::user()->can('delete-any-usage-history'),
+
+                'isAdmin' => fn () =>
+                    Auth::check() && Auth::user()->hasRole('admin'),
+            ]);
         }
-
-        // Create roles
-        $adminRole = Role::firstOrCreate(['name' => 'admin']);
-        $userRole = Role::firstOrCreate(['name' => 'user']);
-
-        // Assign permissions to roles
-        $adminRole->syncPermissions($permissions);
-        $userRole->syncPermissions([
-            'use-pdf-tools',
-            'view-own-usage-history',
-        ]);
-
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
-
-        Inertia::share([
-            'auth' => fn () => [
-                'user' => Auth::user(),
-            ],
-            'canUsePdfTools' => fn () =>
-                Auth::check() && Auth::user()->can('use-pdf-tools'),
-
-            'canViewUsers' => fn () =>
-                Auth::check() && Auth::user()->can('view-users'),
-
-            'canViewOwnHistory' => fn () =>
-                Auth::check() && Auth::user()->can('view-own-usage-history'),
-
-            'canViewAnyHistory' => fn () =>
-                Auth::check() && Auth::user()->can('view-any-usage-history'),
-
-            'canExportHistory' => fn () =>
-                Auth::check() && Auth::user()->can('export-any-usage-history'),
-
-            'canDeleteHistory' => fn () =>
-                Auth::check() && Auth::user()->can('delete-any-usage-history'),
-
-            'isAdmin' => fn () =>
-                Auth::check() && Auth::user()->hasRole('admin'),
-        ]);
     }
 }
