@@ -32,7 +32,7 @@ class ActivityLogController
             "Expires" => "0"
         ];
         
-        $columns = ['ID', 'Pouzivatel', 'ID Pouzivatela', 'Akcia', 'Metoda', 'Detail', 'IP', 'Mesto', 'Krajina', 'Datum'];
+        $columns = ['ID', 'USER', 'USER ID', 'ACTION', 'ACCESS METHOD', 'DETAILS', 'IP ADDRESS', 'CITY', 'COUNTRY', 'DATE'];
         
         $callback = function() use($logs, $columns) {
             $file = fopen('php://output', 'w');
@@ -41,8 +41,8 @@ class ActivityLogController
             foreach($logs as $log) {
                 fputcsv($file, [
                     $log->id,
-                    $log->user->username ?? 'Neznamy',
-                    $log->user->user_id ?? 'Neznamy',
+                    $log->user->username ?? 'Unknown',
+                    $log->user->user_id ?? 'Unknown',
                     $log->action,
                     $log->access_method,
                     $log->details,

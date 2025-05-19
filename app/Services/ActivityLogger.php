@@ -12,15 +12,15 @@ class ActivityLogger
 public static function log($action, $details = null)
 {
     $isInertia = request()->header('X-Inertia') === 'true';
-    $method = $isInertia ? 'frontend' : 'API';
+    $method = $isInertia ? 'Frontend' : 'API';
     
     $ip = request()->ip();
     \Illuminate\Support\Facades\Log::info("Attempting to geolocate IP: " . $ip); // Keep this for now
     
     $userId = \Illuminate\Support\Facades\Auth::id();
 
-    $city = 'Nezname';
-    $country = 'Neznama';
+    $city = 'Unknown';
+    $country = 'Unknown';
     $position = null;
 
     // Check if IP is not local or private before attempting geolocation
@@ -38,14 +38,14 @@ public static function log($action, $details = null)
             $city = 'Localhost';
             $country = 'N/A';
         } else {
-            $city = 'Sukromna siet'; // Private Network
+            $city = 'Private Network'; // Private Network
             $country = 'N/A';
         }
         \Illuminate\Support\Facades\Log::info("IP " . $ip . " is local/private. Skipping external geolocation.");
     } else {
         // Invalid IP or no IP
         \Illuminate\Support\Facades\Log::warning("Invalid or missing IP address: " . ($ip ?: 'null'));
-        $city = 'Neznamy IP';
+        $city = 'Unknown IP';
         $country = 'N/A';
     }
     
