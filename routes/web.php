@@ -11,7 +11,7 @@ use App\Http\Controllers\FileTestController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ManualController;
 
-Route::redirect('/', '/login');
+Route::redirect('/', '/login')->name('home');
 
 Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/login', [AuthController::class, 'storeLogin']);
