@@ -1,0 +1,1499 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "PDF Alchemist",
+        "description": "Swagger dokumentácia pre všetky REST endpointy PDF aplikácie.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://zadanie-skuska.test",
+            "description": "Lokálny vývojový server"
+        }
+    ],
+    "paths": {
+        "/api/logs": {
+            "get": {
+                "tags": [
+                    "Activity Logs"
+                ],
+                "summary": "Get paginated list of activity logs",
+                "operationId": "07383c963952b0e2c533e5ba1e60b0a4",
+                "responses": {
+                    "200": {
+                        "description": "List of activity logs",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ActivityLogEntry"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Activity Logs"
+                ],
+                "summary": "Clear all activity logs",
+                "operationId": "ef73a5ff54cd49a3547327a6dd723c4c",
+                "responses": {
+                    "200": {
+                        "description": "Logs cleared",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "All activity logs have been cleared."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/logs/export": {
+            "get": {
+                "tags": [
+                    "Activity Logs"
+                ],
+                "summary": "Export activity logs to CSV",
+                "operationId": "0f88d0e8e480cbef8d7857477f8980c0",
+                "responses": {
+                    "200": {
+                        "description": "CSV file download"
+                    }
+                }
+            }
+        },
+        "/api/api-key": {
+            "get": {
+                "tags": [
+                    "API Key"
+                ],
+                "summary": "Generate a new API key",
+                "description": "Generates a new API key for the currently authenticated user and returns it in plain text. The key is stored in hashed form in the database.",
+                "operationId": "0db5088d83da4e8f174520aac3df03a4",
+                "responses": {
+                    "200": {
+                        "description": "API key generated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "api_key": {
+                                            "type": "string",
+                                            "example": "9e2cf4f879d449a89bfb1b44b196cf6b0f0a24e86d7356c7df4832e2d49956a7"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized – user must be authenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "apiAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Session-based login",
+                "operationId": "31dd365bddb46a996c2350b0a1fb7381",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "login",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "login": {
+                                        "type": "string",
+                                        "example": "john@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "secret123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful"
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    }
+                }
+            }
+        },
+        "/api/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Register new user (session-based)",
+                "operationId": "392091b67067bb84702403a281d29dff",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "first_name",
+                                    "last_name",
+                                    "username",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "John"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Doe"
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "example": "johndoe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "john@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "secret123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "secret123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Registration successful"
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout user (session-based)",
+                "operationId": "3cb4595617023ec1e0edbd4a6e4f0654",
+                "responses": {
+                    "200": {
+                        "description": "User logged out successfully"
+                    }
+                }
+            }
+        },
+        "/api/download/{token}": {
+            "get": {
+                "tags": [
+                    "Download"
+                ],
+                "summary": "Download file using temporary token",
+                "description": "Downloads a file if a valid session token exists.",
+                "operationId": "e8010ac81df74068fcbb009ccdbda80b",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "description": "Temporary download token",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "abc123xyz"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "File download (binary)"
+                    },
+                    "404": {
+                        "description": "File not found or token expired"
+                    }
+                }
+            }
+        },
+        "/api/manual": {
+            "get": {
+                "tags": [
+                    "Manual"
+                ],
+                "summary": "Get user manual HTML content",
+                "description": "Returns rendered HTML content of the localized user manual.",
+                "operationId": "28c1ae784ea8a130b4eca5b6e34fab98",
+                "responses": {
+                    "200": {
+                        "description": "Manual HTML loaded successfully"
+                    },
+                    "404": {
+                        "description": "Manual not found"
+                    },
+                    "500": {
+                        "description": "Rendering error"
+                    }
+                }
+            }
+        },
+        "/api/manual/pdf": {
+            "get": {
+                "tags": [
+                    "Manual"
+                ],
+                "summary": "Download user manual as PDF",
+                "description": "Returns the user manual as a PDF file for the current locale.",
+                "operationId": "6d3e17ebcaea703e803c87ac10771c4a",
+                "responses": {
+                    "200": {
+                        "description": "PDF manual downloaded"
+                    },
+                    "404": {
+                        "description": "Manual not found"
+                    },
+                    "500": {
+                        "description": "PDF generation error"
+                    }
+                }
+            }
+        },
+        "/api/pdf/merge": {
+            "post": {
+                "tags": [
+                    "PDF"
+                ],
+                "summary": "Merge multiple PDF files into one",
+                "description": "Uploads multiple PDF files and merges them into one downloadable PDF document.",
+                "operationId": "mergePDFs",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "files"
+                                ],
+                                "properties": {
+                                    "files": {
+                                        "description": "Array of PDF files to merge",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    },
+                                    "output_name": {
+                                        "description": "Optional output file name without .pdf extension",
+                                        "type": "string",
+                                        "example": "my-merged-document"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "PDF merged successfully"
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Merging failed or output file was not created"
+                    }
+                }
+            }
+        },
+        "/api/pdf/rotate": {
+            "post": {
+                "tags": [
+                    "PDF"
+                ],
+                "summary": "Rotate pages in a PDF file",
+                "description": "Rotates specified pages (or all pages) in an uploaded PDF file by a given angle.",
+                "operationId": "rotatePDF",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file",
+                                    "angle"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "description": "PDF file to rotate",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "angle": {
+                                        "description": "Rotation angle (90, 180, 270, or negative)",
+                                        "type": "integer",
+                                        "enum": [
+                                            90,
+                                            180,
+                                            270,
+                                            -90,
+                                            -180,
+                                            -270
+                                        ],
+                                        "example": 90
+                                    },
+                                    "pages": {
+                                        "description": "Pages to rotate (e.g. '1,2,4-6'), optional",
+                                        "type": "string",
+                                        "example": "1,3-5"
+                                    },
+                                    "output_name": {
+                                        "description": "Optional name for the output file (without .pdf)",
+                                        "type": "string",
+                                        "example": "rotated-document"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "PDF rotated successfully"
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "PDF rotation failed or output not created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to rotate pages"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/pdf/delete-pages": {
+            "post": {
+                "tags": [
+                    "PDF"
+                ],
+                "summary": "Delete specific pages from a PDF file",
+                "description": "Uploads a PDF and removes specified pages from it. Returns the modified PDF.",
+                "operationId": "deletePages",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file",
+                                    "pages"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "description": "PDF file to modify",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "pages": {
+                                        "description": "Pages to delete, e.g. '1,3,5-7'",
+                                        "type": "string",
+                                        "example": "1,3-5"
+                                    },
+                                    "output_name": {
+                                        "description": "Optional name for the output file (without .pdf)",
+                                        "type": "string",
+                                        "example": "cleaned-document"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "PDF modified successfully"
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Deletion failed or output not created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to delete pages from PDF file"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/pdf/extract-pages": {
+            "post": {
+                "tags": [
+                    "PDF"
+                ],
+                "summary": "Extract specific pages from a PDF file",
+                "description": "Uploads a PDF file and extracts the specified pages into a new document.",
+                "operationId": "extractPages",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file",
+                                    "pages"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "description": "PDF file to extract pages from",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "pages": {
+                                        "description": "Pages to extract (e.g. '2,4-6')",
+                                        "type": "string",
+                                        "example": "2,4-6"
+                                    },
+                                    "output_name": {
+                                        "description": "Optional name for the output file (without .pdf)",
+                                        "type": "string",
+                                        "example": "extracted-pages"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "PDF pages extracted successfully"
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Extraction failed or output not created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to extract pages from PDF file"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/pdf/encrypt": {
+            "post": {
+                "tags": [
+                    "PDF"
+                ],
+                "summary": "Encrypt a PDF file with a password",
+                "description": "Uploads a PDF file and encrypts it with a user password (and optional owner password). Returns the encrypted PDF.",
+                "operationId": "encryptPDF",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file",
+                                    "user_password"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "description": "PDF file to encrypt",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "user_password": {
+                                        "description": "Password required to open the PDF",
+                                        "type": "string",
+                                        "example": "user123"
+                                    },
+                                    "owner_password": {
+                                        "description": "Owner password (optional)",
+                                        "type": "string",
+                                        "example": "admin456"
+                                    },
+                                    "output_name": {
+                                        "description": "Optional name for the encrypted output file (without .pdf)",
+                                        "type": "string",
+                                        "example": "secured-document"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "PDF encrypted successfully"
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Encryption failed or output not created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to encrypt PDF file"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/pdf/decrypt": {
+            "post": {
+                "tags": [
+                    "PDF"
+                ],
+                "summary": "Decrypt a password-protected PDF file",
+                "description": "Uploads a password-protected PDF and removes its encryption using the provided password. Returns the decrypted PDF.",
+                "operationId": "decryptPDF",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "description": "Password-protected PDF file",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "password": {
+                                        "description": "Password to unlock the PDF",
+                                        "type": "string",
+                                        "example": "user123"
+                                    },
+                                    "output_name": {
+                                        "description": "Optional name for the decrypted output file (without .pdf)",
+                                        "type": "string",
+                                        "example": "unlocked-document"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "PDF decrypted successfully"
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Decryption failed or output not created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to decrypt PDF file"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/pdf/overlay": {
+            "post": {
+                "tags": [
+                    "PDF"
+                ],
+                "summary": "Overlay one PDF over another",
+                "description": "Uploads two PDF files. Overlays the second one (or selected page of it) over the first one on specified pages. Returns the resulting PDF.",
+                "operationId": "overlayPDF",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "files"
+                                ],
+                                "properties": {
+                                    "files": {
+                                        "description": "Exactly two PDF files: [base PDF, overlay PDF]",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    },
+                                    "overlay_page_number": {
+                                        "description": "Page number from overlay PDF to use",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "pages": {
+                                        "description": "Pages in base PDF to apply overlay to (e.g. '1,3-5')",
+                                        "type": "string",
+                                        "example": "1,2,4-6"
+                                    },
+                                    "output_name": {
+                                        "description": "Optional name for the output file (without .pdf)",
+                                        "type": "string",
+                                        "example": "overlayed-document"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "PDF overlay successful"
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Overlay failed or output not created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to overlay PDF files"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/pdf/extract-text": {
+            "post": {
+                "tags": [
+                    "PDF"
+                ],
+                "summary": "Extract text content from a PDF file",
+                "description": "Uploads a PDF file and extracts the text content (optionally from specific pages). Returns a plain text file.",
+                "operationId": "extractTextFromPDF",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "description": "PDF file to extract text from",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "pages": {
+                                        "description": "Pages to extract text from (e.g. '1,2,4-5')",
+                                        "type": "string",
+                                        "example": "1,3-5"
+                                    },
+                                    "output_name": {
+                                        "description": "Optional name for the output text file (without .txt)",
+                                        "type": "string",
+                                        "example": "extracted-text"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Text extracted successfully"
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Text extraction failed or output not created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to extract text from PDF file"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/pdf/reverse-pages": {
+            "post": {
+                "tags": [
+                    "PDF"
+                ],
+                "summary": "Reverse the order of pages in a PDF file",
+                "description": "Uploads a PDF file and returns a new PDF with the page order reversed.",
+                "operationId": "reversePDFPages",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "description": "PDF file whose pages should be reversed",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "output_name": {
+                                        "description": "Optional name for the output file (without .pdf)",
+                                        "type": "string",
+                                        "example": "reversed-pages"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "PDF pages reversed successfully"
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Reversal failed or output not created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to reverse pages in PDF file"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/pdf/duplicate-pages": {
+            "post": {
+                "tags": [
+                    "PDF"
+                ],
+                "summary": "Duplicate specific pages in a PDF file",
+                "description": "Uploads a PDF file and duplicates the specified pages a given number of times. Returns the modified PDF.",
+                "operationId": "duplicatePDFPages",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file",
+                                    "pages"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "description": "PDF file to duplicate pages from",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "pages": {
+                                        "description": "Pages to duplicate (e.g. '2,4-5')",
+                                        "type": "string",
+                                        "example": "2,4-5"
+                                    },
+                                    "duplicate_count": {
+                                        "description": "How many times to duplicate selected pages (default 1)",
+                                        "type": "integer",
+                                        "maximum": 10,
+                                        "minimum": 1,
+                                        "example": 2
+                                    },
+                                    "output_name": {
+                                        "description": "Optional name for the output file (without .pdf)",
+                                        "type": "string",
+                                        "example": "duplicated-pages"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "PDF pages duplicated successfully"
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Duplication failed or output not created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to duplicate pages in PDF file"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get list of all users with roles",
+                "operationId": "88e08afbcf11b50e46fded873adde45e",
+                "responses": {
+                    "200": {
+                        "description": "List of users returned successfully"
+                    }
+                }
+            }
+        },
+        "/api/users/{user}/role": {
+            "put": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update user role",
+                "operationId": "58bd3b10d956b21348e51efb3af7b7be",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "role"
+                                ],
+                                "properties": {
+                                    "role": {
+                                        "type": "string",
+                                        "example": "admin"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User role updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Role updated successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/profile": {
+            "get": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Get current authenticated user profile",
+                "operationId": "650b2420492dafd00dec1efd87fb19e8",
+                "responses": {
+                    "200": {
+                        "description": "Authenticated user profile returned"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Update profile of authenticated user",
+                "operationId": "cb8d53629911073b19c0914694bbed73",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "first_name",
+                                    "last_name",
+                                    "email"
+                                ],
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "John"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "john@example.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profile updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Profile updated successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                }
+            }
+        },
+        "/api/profile/password": {
+            "put": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Update password of authenticated user",
+                "operationId": "953981ba937ae6603dd33a4a1e2d6cc1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "current_password",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "current_password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "oldpass123"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "newpass456"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "newpass456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Password updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Password updated successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ActivityLogEntry": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 123
+                    },
+                    "user": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 5
+                            },
+                            "username": {
+                                "type": "string",
+                                "example": "john_doe"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "action": {
+                        "type": "string",
+                        "example": "merge"
+                    },
+                    "access_method": {
+                        "type": "string",
+                        "example": "api"
+                    },
+                    "details": {
+                        "type": "string",
+                        "example": "Merged 3 PDF files"
+                    },
+                    "ip_address": {
+                        "type": "string",
+                        "example": "192.168.1.10"
+                    },
+                    "city": {
+                        "type": "string",
+                        "example": "Bratislava"
+                    },
+                    "country": {
+                        "type": "string",
+                        "example": "Slovakia"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-12-01T12:34:56Z"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Activity Logs",
+            "description": "User activity log management"
+        },
+        {
+            "name": "Download",
+            "description": "File download using a temporary token"
+        },
+        {
+            "name": "Manual",
+            "description": "User manual access and PDF export"
+        },
+        {
+            "name": "API Key",
+            "description": "API Key"
+        },
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
+            "name": "PDF",
+            "description": "PDF"
+        },
+        {
+            "name": "Users",
+            "description": "Users"
+        },
+        {
+            "name": "Profile",
+            "description": "Profile"
+        }
+    ]
+}

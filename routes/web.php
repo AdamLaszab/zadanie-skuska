@@ -25,6 +25,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/api-key/regenerate', [ApiKeyController::class, 'newApiKeyInertia'])->name('api.key.regenerate');
     Route::get('/manual', [ManualController::class, 'show'])->name('manual.show');
     Route::get('/manual/export-pdf', [ManualController::class, 'exportPdf'])->name('manual.export.pdf');
+
+    Route::get('/swagger', function () {
+        return Inertia::render('SwaggerPage');
+    })->name('swagger');
+
 });
 
 

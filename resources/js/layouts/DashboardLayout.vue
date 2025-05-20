@@ -34,6 +34,7 @@ const navItems: NavItem[] = [
     { label: 'Activity', href: route('admin.logs.index'), permission: 'view-users' },
     { label: 'Manual', href: route('manual.show'), permission: 'use-pdf-tools' },
     { label: 'User List', href: route('admin.users'), permission: 'view-users' },
+    { label: 'API Documentation ', href: route('swagger'), permission: 'use-pdf-tools' },
     // { label: 'Admin Panel', href: route('admin.logs.index'), role: 'admin' },
 ];
 
