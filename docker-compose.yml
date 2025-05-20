@@ -11,6 +11,7 @@ services:
     volumes:
       - app_assets:/var/www/public/build
       - image_assets:/var/www/public/images
+      - docs_assets:/var/www/public/docs
 
     networks:
       - app-network
@@ -30,7 +31,7 @@ services:
     volumes:
       - app_assets:/var/www/public/build
       - image_assets:/var/www/public/images
-      - ./nginx:/etc/nginx/conf.d/
+      - docs_assets:/var/www/public/docs
     networks:
       - app-network
     depends_on:
@@ -69,4 +70,6 @@ volumes:
   app_assets:
     driver: local
   image_assets:
+    driver: local
+  docs_assets:
     driver: local

@@ -1,13 +1,13 @@
 #!/bin/sh
 set -e
 
+php artisan migrate --force
+
 php artisan optimize:clear
 
 composer dump-autoload --optimize
 
 php artisan package:discover --ansi
-
-php artisan migrate --force
 
 echo "Running RolesAndPermissionsSeeder..."
 php artisan db:seed --class=RolesAndPermissionsSeeder --force
