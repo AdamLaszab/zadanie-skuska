@@ -19,6 +19,9 @@ services:
         condition: service_healthy
 
   webserver:
+    build:
+      context: ./nginx_config
+      dockerfile: Dockerfile
     image: nginx:alpine
     container_name: nginx-webserver
     restart: unless-stopped
