@@ -18,6 +18,8 @@ RUN apt-get install -y \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd
 
+RUN apt-get install -y python3 python3-pip python3-venv
+
 RUN docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring zip exif pcntl
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -31,6 +33,10 @@ COPY . .
 RUN npm run build
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+COPY pdf_python/requirements.txt ./pdf_python/
+RUN python3 -m venv /var/www/pdf_python/venv && \
+    /var/www/pdf_python/venv/bin/pip install --no-cache-dir -r pdf_python/requirements.txt
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh

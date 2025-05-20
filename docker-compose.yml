@@ -1,18 +1,16 @@
+# PRE SPRAVNU FUNKCIU MUSI BYT DEFINOVANY .env KTORY POUZIJE PODLA .env.docker.example
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    image: laravel-self-contained-app
-    container_name: laravel-self-contained-app
+    image: laravel-app
+    container_name: laravel-app
     restart: unless-stopped
-    tty: true
-    environment:
-      SERVICE_NAME: app
-      SERVICE_TAGS: dev
     working_dir: /var/www
     volumes:
       - app_assets:/var/www/public/build
+      - image_assets:/var/www/public/images
 
     networks:
       - app-network
@@ -28,6 +26,7 @@ services:
       - "8080:80"
     volumes:
       - app_assets:/var/www/public/build
+      - image_assets:/var/www/public/images
       - ./nginx:/etc/nginx/conf.d/
     networks:
       - app-network
@@ -39,9 +38,9 @@ services:
     container_name: mysql
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: dbname
-      MYSQL_USER: dbuser
-      MYSQL_PASSWORD: dbpassword
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: root
       MYSQL_ROOT_HOST: '%'
     ports:
@@ -65,4 +64,6 @@ volumes:
   dbdata:
     driver: local
   app_assets:
+    driver: local
+  image_assets:
     driver: local

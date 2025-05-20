@@ -1,16 +1,12 @@
 #!/bin/sh
 set -e
 
-echo "Clearing potentially stale Laravel caches..."
 php artisan optimize:clear
 
-echo "Optimizing Composer autoloader..."
 composer dump-autoload --optimize
 
-echo "Ensuring Composer packages are discovered..."
 php artisan package:discover --ansi
 
-echo "Running database migrations..."
 php artisan migrate --force
 
 echo "Checking if seeding is necessary..."
