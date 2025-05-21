@@ -7,12 +7,11 @@
     },
     "servers": [
         {
-            "url": "http://zadanie-skuska.test",
-            "description": "Lokálny vývojový server"
+            "url": "https://node113.webte.fei.stuba.sk"
         }
     ],
     "paths": {
-        "/api/logs": {
+        "/pdf/api/logs": {
             "get": {
                 "tags": [
                     "Activity Logs"
@@ -66,7 +65,7 @@
                 }
             }
         },
-        "/api/logs/export": {
+        "/pdf/api/logs/export": {
             "get": {
                 "tags": [
                     "Activity Logs"
@@ -80,7 +79,7 @@
                 }
             }
         },
-        "/api/api-key": {
+        "/pdf/api/api-key": {
             "get": {
                 "tags": [
                     "API Key"

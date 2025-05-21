@@ -7,12 +7,11 @@
     },
     "servers": [
         {
-            "url": "http://zadanie-skuska.test",
-            "description": "Lokálny vývojový server"
+            "url": "https://node113.webte.fei.stuba.sk"
         }
     ],
     "paths": {
-        "/api/logs": {
+        "/api/pdf/logs": {
             "get": {
                 "tags": [
                     "Activity Logs"
@@ -66,7 +65,7 @@
                 }
             }
         },
-        "/api/logs/export": {
+        "/api/pdf/logs/export": {
             "get": {
                 "tags": [
                     "Activity Logs"
@@ -80,7 +79,7 @@
                 }
             }
         },
-        "/api/api-key": {
+        "/api/pdf/api-key": {
             "get": {
                 "tags": [
                     "API Key"
@@ -232,37 +231,7 @@
                 }
             }
         },
-        "/api/download/{token}": {
-            "get": {
-                "tags": [
-                    "Download"
-                ],
-                "summary": "Download file using temporary token",
-                "description": "Downloads a file if a valid session token exists.",
-                "operationId": "e8010ac81df74068fcbb009ccdbda80b",
-                "parameters": [
-                    {
-                        "name": "token",
-                        "in": "path",
-                        "description": "Temporary download token",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "example": "abc123xyz"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "File download (binary)"
-                    },
-                    "404": {
-                        "description": "File not found or token expired"
-                    }
-                }
-            }
-        },
-        "/api/manual": {
+        "/api/pdf/manual": {
             "get": {
                 "tags": [
                     "Manual"
@@ -283,7 +252,7 @@
                 }
             }
         },
-        "/api/manual/pdf": {
+        "/api/pdf/manual/pdf": {
             "get": {
                 "tags": [
                     "Manual"
@@ -1199,7 +1168,7 @@
                 }
             }
         },
-        "/api/users": {
+        "/api/pdf/users": {
             "get": {
                 "tags": [
                     "Users"
@@ -1213,7 +1182,7 @@
                 }
             }
         },
-        "/api/users/{user}/role": {
+        "/api/pdf/users/{user}/role": {
             "put": {
                 "tags": [
                     "Users"
@@ -1273,7 +1242,7 @@
                 }
             }
         },
-        "/api/profile": {
+        "/api/pdf/profile": {
             "get": {
                 "tags": [
                     "Profile"
@@ -1344,7 +1313,7 @@
                 }
             }
         },
-        "/api/profile/password": {
+        "/api/pdf/profile/password": {
             "put": {
                 "tags": [
                     "Profile"
@@ -1466,10 +1435,6 @@
         {
             "name": "Activity Logs",
             "description": "User activity log management"
-        },
-        {
-            "name": "Download",
-            "description": "File download using a temporary token"
         },
         {
             "name": "Manual",
