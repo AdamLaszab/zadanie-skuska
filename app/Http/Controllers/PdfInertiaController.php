@@ -980,10 +980,10 @@ public function showOverlayForm()
                 "--overlay-page-number", (string)$overlayPageNumber,
             ];
             if ($targetPagesSpecSanitized && strtolower($targetPagesSpecSanitized) !== 'all') {
-                $command[] = "--target-pages"; // Alebo --pages, podľa vášho argparse
+                $command[] = "--pages"; // Alebo --pages, podľa vášho argparse
                 $command[] = $targetPagesSpecSanitized;
             } elseif (empty($targetPagesSpecSanitized)) {
-                 $command[] = "--target-pages";
+                 $command[] = "--pages";
                  $command[] = "all";
             }
             // Ak je 'all', Python skript by to mal brať ako default, ak parameter chýba alebo je 'all'
