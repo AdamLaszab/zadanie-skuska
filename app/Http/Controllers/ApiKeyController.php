@@ -18,9 +18,8 @@ class ApiKeyController {
     private function generateApiKey(User $user)
     {
         $plainTextKey = Str::random(64);
-        $hashedKey = hash('sha256', $plainTextKey);
 
-        $user->api_key = $hashedKey;
+        $user->api_key = $plainTextKey;
         $user->save();
 
         return $plainTextKey;

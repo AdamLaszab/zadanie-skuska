@@ -1,5 +1,5 @@
 <!-- PDF Alchemist User Manual - Optimized for Vue.js/Inertia integration -->
-<div class="pdfcar-manual"> <!-- You might want to rename this class to pdf-alchemist-manual -->
+<div class="pdfcar-manual"> <!-- Keeping the existing class for compatibility -->
   <style>
     /* Custom styles for the PDF Alchemist manual that work within the existing layout */
     /* Ensure UTF-8 and a suitable font for PDF generation if this style block is directly used by DomPDF */
@@ -14,14 +14,14 @@
         font-family: 'DejaVu Sans Mono', monospace; /* For code blocks */
     }
 
-    .pdfcar-manual { /* Consider renaming to .pdf-alchemist-manual */
+    .pdfcar-manual {
       --primary-color: #3498db;
       --secondary-color: #2980b9;
       --accent-color: #e67e22;
       --border-color: #e1e4e8;
     }
 
-    .pdfcar-manual .manual-header { /* Consider renaming to .pdf-alchemist-manual .manual-header */
+    .pdfcar-manual .manual-header {
       background:rgb(255, 255, 255); /* Changed to white for better contrast with the SVG */
       color: black;
       padding: 2rem;
@@ -31,7 +31,7 @@
     }
 
     /* Adjusted logo container for the SVG */
-    .pdfcar-manual .logo-container { /* Consider renaming to .pdf-alchemist-manual .logo-container */
+    .pdfcar-manual .logo-container {
       width: 100px; /* Adjust as needed for your SVG's desired display size */
       height: 100px; /* Adjust as needed */
       margin: 0 auto 1rem;
@@ -46,7 +46,7 @@
         display: block; /* Prevents extra space below the image */
     }
 
-    .pdfcar-manual .toc { /* Consider renaming to .pdf-alchemist-manual .toc */
+    .pdfcar-manual .toc {
       background-color: #f8f9fa;
       border-radius: 0.5rem;
       padding: 1.5rem;
@@ -212,239 +212,329 @@
       <li><a href="#introduction">1. Introduction to the Application</a></li>
       <li><a href="#web-interface-usage">2. Web Interface Usage</a></li>
       <li class="subitem"><a href="#frontend-merge">2.1. Merging PDF Files (Merge)</a></li>
-      <li class="subitem"><a href="#frontend-encrypt">2.2. Encrypting PDF (Encrypt)</a></li>
-      <li class="subitem"><a href="#frontend-decrypt">2.3. Decrypting PDF (Decrypt)</a></li>
-      <li class="subitem"><a href="#frontend-reverse">2.4. Reversing Page Order (Reverse)</a></li>
-      <li class="subitem"><a href="#frontend-rotate">2.5. Rotating Pages (Rotate)</a></li>
-      <li class="subitem"><a href="#frontend-extract-pages">2.6. Extracting Pages (Extract Pages)</a></li>
-      <li class="subitem"><a href="#frontend-delete-pages">2.7. Deleting Pages (Delete Pages)</a></li>
-      <li class="subitem"><a href="#frontend-overlay">2.8. Overlaying PDF (Overlay/Watermark)</a></li>
-      <li class="subitem"><a href="#frontend-extract-text">2.9. Extracting Text (Extract Text)</a></li>
+      <li class="subitem"><a href="#frontend-extract-pages">2.2. Extracting Pages (Extract Pages)</a></li>
+      <li class="subitem"><a href="#frontend-rotate">2.3. Rotating Pages (Rotate)</a></li>
+      <li class="subitem"><a href="#frontend-delete-pages">2.4. Deleting Pages (Delete Pages)</a></li>
+      <li class="subitem"><a href="#frontend-encrypt">2.5. Encrypting PDF (Encrypt)</a></li>
+      <li class="subitem"><a href="#frontend-decrypt">2.6. Decrypting PDF (Decrypt)</a></li>
+      <li class="subitem"><a href="#frontend-overlay">2.7. Overlaying PDF (Overlay/Watermark)</a></li>
+      <li class="subitem"><a href="#frontend-extract-text">2.8. Extracting Text (Extract Text)</a></li>
+      <li class="subitem"><a href="#frontend-reverse">2.9. Reversing Page Order (Reverse)</a></li>
       <li class="subitem"><a href="#frontend-duplicate-pages">2.10. Duplicating Pages (Duplicate Pages)</a></li>
       <li><a href="#api-usage">3. API Usage</a></li>
       <li class="subitem"><a href="#api-auth">3.1. Authentication</a></li>
       <li class="subitem"><a href="#api-endpoints">3.2. Available API Endpoints</a></li>
+      <li class="subitem"><a href="#api-examples">3.3. API Examples</a></li>
     </ul>
   </div>
 
   <section id="introduction">
     <h2>1. Introduction to the PDF Alchemist Application</h2>
-    <p>PDF Alchemist is your comprehensive online application for simple and fast processing of PDF files. Our interface allows you to perform a wide range of PDF file modifications efficiently and without the need to install software.</p>
+    <p>PDF Alchemist is a comprehensive web application for efficient PDF file processing. Our interface allows you to perform a wide range of PDF modifications without installing additional software.</p>
 
     <div class="feature-box">
       <h4>Key features of PDF Alchemist include:</h4>
       <ul>
-        <li>Merging multiple PDF files into a single document (Merge)</li>
-        <li>Encrypting PDF files with a password (Encrypt)</li>
-        <li>Decrypting PDF files using a password (Decrypt)</li>
-        <li>Reversing the order of pages in a PDF (Reverse)</li>
-        <li>Rotating individual or all pages (Rotate)</li>
-        <li>Extracting selected pages into a new PDF (Extract Pages)</li>
-        <li>Deleting specific pages from a PDF (Delete Pages)</li>
-        <li>Adding a watermark or overlaying with another PDF (Overlay)</li>
-        <li>Extracting text content from a PDF (Extract Text)</li>
-        <li>Duplicating selected pages within a PDF (Duplicate Pages)</li>
-        <li>Splitting PDF into smaller parts (Split)</li>
-        <li>Compressing large files (Compress)</li>
+        <li>Merging multiple PDF files into a single document</li>
+        <li>Extracting specific pages from a PDF into a new file</li>
+        <li>Rotating individual or all pages in a PDF</li>
+        <li>Deleting specific pages from a PDF</li>
+        <li>Encrypting PDF files with a password</li>
+        <li>Decrypting PDF files using a password</li>
+        <li>Adding a watermark or overlaying with another PDF/image</li>
+        <li>Extracting text content from a PDF</li>
+        <li>Reversing the order of pages in a PDF</li>
+        <li>Duplicating selected pages within a PDF</li>
       </ul>
     </div>
   </section>
 
   <section id="web-interface-usage">
     <h2>2. Using the Web Interface</h2>
-    <p>Our web interface provides an intuitive and user-friendly access to all PDF editing tools. Below you will find a description of individual functions.</p>
+    <p>Our web interface provides an intuitive and user-friendly access to all PDF editing tools. All tools are accessible from the Dashboard, which shows cards for each available PDF operation.</p>
 
     <article id="frontend-merge">
       <h3>2.1. Merging PDF Files (Merge)</h3>
       <p>To combine two or more PDF files into one, follow these steps:</p>
       <ol>
-        <li>In the navigation menu, click on "<strong>Merge PDF</strong>".</li>
-        <li>Using the "<strong>Select Files</strong>" button or by dragging and dropping, upload the PDF files you want to merge.</li>
-        <li>You can arrange the files by dragging them into the desired order.</li>
-        <li>Enter an optional name for the output file.</li>
-        <li>Click the "<strong>Merge PDF</strong>" button.</li>
-        <li>After processing is complete, a link to download the resulting file will be displayed.</li>
-      </ol>
-    </article>
-
-    <article id="frontend-encrypt">
-      <h3>2.2. Encrypting PDF (Encrypt)</h3>
-      <p>Secure your PDF files with a password against unauthorized opening or editing.</p>
-      <ol>
-        <li>Select the "<strong>Encrypt PDF</strong>" tool.</li>
-        <li>Upload the PDF file you want to encrypt.</li>
-        <li>Enter a strong password to open the document (user password).</li>
-        <li>Optionally, you can also enter an owner password, which will restrict permissions such as printing, copying content, etc.</li>
-        <li>Confirm the encryption. Download the encrypted file.</li>
-      </ol>
-    </article>
-
-    <article id="frontend-decrypt">
-      <h3>2.3. Decrypting PDF (Decrypt)</h3>
-      <p>Remove password protection from a PDF file if you know the necessary password.</p>
-      <ol>
-        <li>Choose the "<strong>Decrypt PDF</strong>" function.</li>
-        <li>Upload the encrypted PDF file.</li>
-        <li>Enter the password required to open or edit the file.</li>
-        <li>Click "<strong>Decrypt</strong>". After successfully removing the protection, you can download the unprotected file.</li>
-      </ol>
-      <div class="feature-box">
-        <h4>Note</h4>
-        <p>Decryption is only possible if you have authorization (know the password). It is not intended to bypass legitimate protection.</p>
-      </div>
-    </article>
-
-    <article id="frontend-reverse">
-      <h3>2.4. Reversing Page Order (Reverse)</h3>
-      <p>Change the order of pages in a PDF document from last to first.</p>
-      <ol>
-        <li>In the menu, select "<strong>Reverse Pages</strong>".</li>
-        <li>Upload the PDF file.</li>
-        <li>The application will automatically reverse the order of all pages.</li>
-        <li>Download the modified PDF file.</li>
-      </ol>
-    </article>
-
-    <article id="frontend-rotate">
-      <h3>2.5. Rotating Pages (Rotate)</h3>
-      <p>Correct page orientation or rotate specific pages in a PDF.</p>
-      <ol>
-        <li>Click on the "<strong>Rotate PDF</strong>" tool.</li>
-        <li>Upload your PDF file.</li>
-        <li>A preview of the pages will be displayed. You can select individual pages, a range of pages, or all pages.</li>
-        <li>Choose the rotation angle (90° right, 90° left, 180°).</li>
-        <li>Apply the changes and download the resulting PDF.</li>
+        <li>Navigate to <strong>Dashboard</strong> to see all available tools.</li>
+        <li>Click on <strong>Merge PDFs</strong> card or the <strong>Open Tool</strong> button.</li>
+        <li>Click the "<strong>Select Files</strong>" button to upload the PDF files you want to merge.</li>
+        <li>You can optionally provide a name for the output file in the "Output Name" field.</li>
+        <li>Click the "<strong>Merge PDFs</strong>" button.</li>
+        <li>After processing is complete, a download button will appear to save the resulting merged PDF.</li>
       </ol>
     </article>
 
     <article id="frontend-extract-pages">
-      <h3>2.6. Extracting Pages (Extract Pages)</h3>
+      <h3>2.2. Extracting Pages (Extract Pages)</h3>
       <p>Create a new PDF file containing only selected pages from the original document.</p>
       <ol>
-        <li>Select "<strong>Extract Pages</strong>".</li>
-        <li>Upload the PDF file.</li>
-        <li>Enter the page numbers or page range you want to extract (e.g., 1-3, 5, 7-9).</li>
-        <li>Click "<strong>Extract</strong>". A new PDF file with the selected pages will be ready for download.</li>
+        <li>From the <strong>Dashboard</strong>, find and click on the <strong>Extract Pages</strong> card.</li>
+        <li>Upload your PDF file using the file selector.</li>
+        <li>Enter the page numbers or page range you want to extract (e.g., 1,3-5,7).</li>
+        <li>Optionally specify a name for the output file.</li>
+        <li>Click "<strong>Extract Pages</strong>". After processing, you can download the new PDF containing only the selected pages.</li>
+      </ol>
+    </article>
+
+    <article id="frontend-rotate">
+      <h3>2.3. Rotating Pages (Rotate)</h3>
+      <p>Correct page orientation or rotate specific pages in a PDF.</p>
+      <ol>
+        <li>From the <strong>Dashboard</strong>, click on the <strong>Rotate PDF</strong> card.</li>
+        <li>Upload your PDF file.</li>
+        <li>Select the rotation angle (90°, 180°, 270°) from the dropdown menu.</li>
+        <li>Specify which pages to rotate by entering page numbers or ranges (e.g., "1,3-5" or "all" for all pages).</li>
+        <li>Optionally provide a name for the output file.</li>
+        <li>Click "<strong>Rotate Pages</strong>" and download the result after processing.</li>
       </ol>
     </article>
 
     <article id="frontend-delete-pages">
-      <h3>2.7. Deleting Pages (Delete Pages)</h3>
+      <h3>2.4. Deleting Pages (Delete Pages)</h3>
       <p>Remove unnecessary pages from your PDF document.</p>
       <ol>
-        <li>Choose the "<strong>Delete Pages</strong>" tool.</li>
-        <li>Upload the PDF file.</li>
-        <li>Specify the page numbers or page ranges you want to remove.</li>
-        <li>Confirm your selection. The PDF file without the deleted pages will be available for download.</li>
+        <li>From the <strong>Dashboard</strong>, select the <strong>Delete Pages</strong> card.</li>
+        <li>Upload the PDF file you want to modify.</li>
+        <li>Enter the page numbers or page ranges you want to remove (e.g., 1,3,5-7).</li>
+        <li>Optionally specify a name for the output file.</li>
+        <li>Click "<strong>Delete Pages</strong>" and download the result after processing.</li>
       </ol>
     </article>
 
-    <article id="frontend-overlay">
-      <h3>2.8. Overlaying PDF</h3>
-      <p>Add a watermark (text or image) or overlay a PDF file with another PDF file (e.g., letterhead).</p>
+    <article id="frontend-encrypt">
+      <h3>2.5. Encrypting PDF (Encrypt)</h3>
+      <p>Secure your PDF files with a password against unauthorized opening or editing.</p>
       <ol>
-        <li>In the menu, choose "<strong>Overlay PDF</strong>".</li>
-        <li>Upload the main PDF file.</li>
-    
-        <li>Upload the second PDF or image file to be used as the overlay.</li>
-        <li>Set whether the overlay should be applied to all pages or only selected ones.</li>
-        <li>Process and download the modified PDF.</li>
+        <li>From the <strong>Dashboard</strong>, find and click on the <strong>Encrypt PDF</strong> card.</li>
+        <li>Upload the PDF file you want to encrypt.</li>
+        <li>Enter a user password that will be required to open the document.</li>
+        <li>Optionally, enter an owner password that provides additional permissions control.</li>
+        <li>Optionally provide a name for the output file.</li>
+        <li>Click "<strong>Encrypt PDF</strong>" and download the encrypted file after processing.</li>
+      </ol>
+      <div class="feature-box">
+        <h4>Note</h4>
+        <p>Remember to store your passwords in a safe place. If you lose the password, you won't be able to access the encrypted PDF.</p>
+      </div>
+    </article>
+
+    <article id="frontend-decrypt">
+      <h3>2.6. Decrypting PDF (Decrypt)</h3>
+      <p>Remove password protection from a PDF file when you have the necessary password.</p>
+      <ol>
+        <li>From the <strong>Dashboard</strong>, find and click on the <strong>Decrypt PDF</strong> card.</li>
+        <li>Upload the encrypted PDF file.</li>
+        <li>Enter the password required to open the file.</li>
+        <li>Optionally specify a name for the output file.</li>
+        <li>Click "<strong>Decrypt PDF</strong>" and download the unprotected file after processing.</li>
+      </ol>
+      <div class="feature-box">
+        <h4>Note</h4>
+        <p>Decryption is only possible if you have authorization (know the password). The tool is not designed to bypass legitimate protection mechanisms.</p>
+      </div>
+    </article>
+
+    <article id="frontend-overlay">
+      <h3>2.7. Overlaying PDF</h3>
+      <p>Add a watermark or overlay a PDF file with another PDF file or image.</p>
+      <ol>
+        <li>From the <strong>Dashboard</strong>, locate and click on the <strong>Overlay PDF</strong> card.</li>
+        <li>Upload the main PDF file that will serve as the base document.</li>
+        <li>Upload the overlay PDF or image file that will be placed on top of the main file.</li>
+        <li>Specify which page from the overlay file to use (typically page 1).</li>
+        <li>Enter the page numbers or page ranges of the main PDF where the overlay should be applied.</li>
+        <li>Optionally provide a name for the output file.</li>
+        <li>Click "<strong>Apply Overlay</strong>" and download the result after processing.</li>
       </ol>
     </article>
 
     <article id="frontend-extract-text">
-      <h3>2.9. Extracting Text (Extract Text)</h3>
-      <p>Get all text content from a PDF file into a simple text format (.txt).</p>
+      <h3>2.8. Extracting Text (Extract Text)</h3>
+      <p>Extract all text content from a PDF file into a plain text format (.txt).</p>
       <ol>
-        <li>Select "<strong>Extract Text</strong>".</li>
-        <li>Upload the PDF file.</li>
-        <li>The application will process the file and extract the text.</li>
-        <li>You can copy the extracted text or download it as a .txt file.</li>
+        <li>From the <strong>Dashboard</strong>, find and click on the <strong>Extract Text</strong> card.</li>
+        <li>Upload the PDF file you want to extract text from.</li>
+        <li>Optionally specify which pages to extract text from.</li>
+        <li>Provide a name for the output text file if desired.</li>
+        <li>Click "<strong>Extract Text</strong>" and download the resulting .txt file after processing.</li>
       </ol>
       <div class="feature-box">
         <h4>Limitations</h4>
-        <p>The quality of the extracted text depends on whether the PDF contains actual text or just images of text (scanned documents). For images of text, OCR (Optical Character Recognition) is required, which this function may not cover.</p>
+        <p>The quality of the extracted text depends on whether the PDF contains actual text or just images of text (scanned documents). For scanned documents, the extraction may not produce accurate results as this tool does not include OCR (Optical Character Recognition) functionality.</p>
       </div>
+    </article>
+
+    <article id="frontend-reverse">
+      <h3>2.9. Reversing Page Order (Reverse)</h3>
+      <p>Change the order of pages in a PDF document from last to first.</p>
+      <ol>
+        <li>From the <strong>Dashboard</strong>, locate and click on the <strong>Reverse Pages</strong> card.</li>
+        <li>Upload the PDF file you want to reverse.</li>
+        <li>Optionally provide a name for the output file.</li>
+        <li>Click "<strong>Reverse Pages</strong>" and download the modified PDF after processing.</li>
+      </ol>
     </article>
 
     <article id="frontend-duplicate-pages">
       <h3>2.10. Duplicating Pages (Duplicate Pages)</h3>
       <p>Create copies of selected pages within your PDF document.</p>
       <ol>
-        <li>Choose the "<strong>Duplicate Pages</strong>" tool.</li>
+        <li>From the <strong>Dashboard</strong>, find and click on the <strong>Duplicate Pages</strong> card.</li>
         <li>Upload the PDF file.</li>
-        <li>Select the pages you want to duplicate and how many times each selected page should be duplicated.</li>
-        <li>Specify whether duplicates should be inserted immediately after the original or at the end of the document.</li>
-        <li>Process and download the PDF with duplicated pages.</li>
+        <li>Enter the page numbers or page ranges you want to duplicate.</li>
+        <li>Specify how many copies you want to make of each selected page (Duplicate Count).</li>
+        <li>Optionally provide a name for the output file.</li>
+        <li>Click "<strong>Duplicate Pages</strong>" and download the result after processing.</li>
       </ol>
     </article>
   </section>
 
   <section id="api-usage">
-    <h2>3. Using the API (PDF Alchemist)</h2>
-    <p>The PDF Alchemist application also provides an API interface for programmatic processing of PDF files. The API is ideal for integration into your own applications or for automating document processing.</p>
+    <h2>3. Using the API</h2>
+    <p>PDF Alchemist provides a RESTful API for programmatic PDF processing. This allows you to integrate PDF operations into your own applications or automate document workflows.</p>
 
     <article id="api-auth">
       <h3>3.1. Authentication</h3>
-      <p>An API key is required to access the API. You can generate it in your profile after logging in.</p>
-      <p>Send the API key in the HTTP header <code>X-API-Key</code>:</p>
-      <pre><code>X-API-Key: YOUR_API_KEY</code></pre>
+      <p>To use the API, you need to authenticate with an API key. You can generate or regenerate your API key in your profile settings.</p>
+
+      <h4>Obtaining an API Key</h4>
+      <ol>
+        <li>Log in to your PDF Alchemist account.</li>
+        <li>Navigate to your profile page.</li>
+        <li>Click on "Generate API Key" or "Regenerate API Key".</li>
+        <li>Copy and securely store your API key. Note that for security reasons, you won't be able to view the key again after navigating away.</li>
+      </ol>
+
+      <h4>Using the API Key</h4>
+      <p>Include your API key in the HTTP Authorization header as a Bearer token:</p>
+      <pre><code>Authorization: Bearer YOUR_API_KEY</code></pre>
 
       <div class="feature-box">
         <h4>Security Warning</h4>
-        <p>Never share your API key or store it in client-side application code. Always manage it on the server-side.</p>
+        <p>Treat your API key as a password. Never share it or store it in client-side code. Always transmit it over HTTPS and manage it securely on your server.</p>
       </div>
     </article>
 
     <article id="api-endpoints">
       <h3>3.2. Available API Endpoints</h3>
-      <p>Our API provides access to all functions available through the web interface. Each function (merging, encrypting, rotating, etc.) has its specific endpoint.</p>
-      <p>For example, for merging PDF files:</p>
+      <p>The API provides endpoints for all PDF operations available in the web interface. All API routes are prefixed with <code>/api/pdf/</code>.</p>
       <table class="api-table">
         <tr>
-          <th>Function</th>
-          <th>Endpoint (Example)</th>
+          <th>Operation</th>
+          <th>Endpoint</th>
           <th>Method</th>
+          <th>Required Parameters</th>
         </tr>
         <tr>
-          <td>Merge PDF</td>
-          <td><code>POST /api/v1/pdf/merge</code></td>
+          <td>Merge PDFs</td>
+          <td><code>/api/pdf/merge</code></td>
           <td>POST</td>
+          <td>files[] (array of PDF files)</td>
+        </tr>
+        <tr>
+          <td>Extract Pages</td>
+          <td><code>/api/pdf/extract-pages</code></td>
+          <td>POST</td>
+          <td>file, pages</td>
+        </tr>
+        <tr>
+          <td>Rotate Pages</td>
+          <td><code>/api/pdf/rotate</code></td>
+          <td>POST</td>
+          <td>file, angle</td>
+        </tr>
+        <tr>
+          <td>Delete Pages</td>
+          <td><code>/api/pdf/delete-pages</code></td>
+          <td>POST</td>
+          <td>file, pages</td>
         </tr>
         <tr>
           <td>Encrypt PDF</td>
-          <td><code>POST /api/v1/pdf/encrypt</code></td>
+          <td><code>/api/pdf/encrypt</code></td>
           <td>POST</td>
+          <td>file, user_password</td>
+        </tr>
+        <tr>
+          <td>Decrypt PDF</td>
+          <td><code>/api/pdf/decrypt</code></td>
+          <td>POST</td>
+          <td>file, password</td>
+        </tr>
+        <tr>
+          <td>Overlay PDF</td>
+          <td><code>/api/pdf/overlay</code></td>
+          <td>POST</td>
+          <td>files[] (2 files: base and overlay)</td>
         </tr>
         <tr>
           <td>Extract Text</td>
-          <td><code>POST /api/v1/pdf/extract-text</code></td>
+          <td><code>/api/pdf/extract-text</code></td>
           <td>POST</td>
+          <td>file</td>
         </tr>
         <tr>
-          <td colspan="3"><em>...and similarly for all other functions.</em></td>
+          <td>Reverse Pages</td>
+          <td><code>/api/pdf/reverse-pages</code></td>
+          <td>POST</td>
+          <td>file</td>
+        </tr>
+        <tr>
+          <td>Duplicate Pages</td>
+          <td><code>/api/pdf/duplicate-pages</code></td>
+          <td>POST</td>
+          <td>file, pages</td>
         </tr>
       </table>
-      <p>Detailed specifications for each API endpoint, including required parameters and response formats, can be found in the separate API documentation available after logging in, in the "API Documentation" section.</p>
 
-      <h4>Example (cURL for Merge):</h4>
-      <pre><code>curl -X POST https://pdfalchemist.example.com/api/v1/pdf/merge \
--H "X-API-Key: YOUR_API_KEY" \
--H "Accept: application/json" \
--F "files[]=@/path/to/file1.pdf" \
--F "files[]=@/path/to/file2.pdf" \
--F "output_name=my_merged_document" \
---output result.pdf</code></pre>
+      <div class="feature-box">
+        <h4>Common Optional Parameters</h4>
+        <p>Most endpoints accept an optional <code>output_name</code> parameter to specify the name of the output file.</p>
+      </div>
+      
+      <p>For detailed API documentation including all parameters, request/response formats, and examples, refer to the Swagger documentation available at <code>/swagger</code> after logging in.</p>
+    </article>
 
-      <h4>Successful Response (e.g., 200 OK for Merge):</h4>
-      <p>Direct download of the PDF file or a JSON response with a download link/data.</p>
+    <article id="api-examples">
+      <h3>3.3. API Examples</h3>
 
-      <h4>Error Response (e.g., 422 Unprocessable Entity):</h4>
+      <h4>Example: Merging PDF Files</h4>
+      <pre><code>curl -X POST https://your-domain.com/api/pdf/merge \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Accept: application/json" \
+  -F "files[]=@/path/to/file1.pdf" \
+  -F "files[]=@/path/to/file2.pdf" \
+  -F "output_name=merged_document"</code></pre>
+
+      <h4>Example: Rotating PDF Pages</h4>
+      <pre><code>curl -X POST https://your-domain.com/api/pdf/rotate \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Accept: application/json" \
+  -F "file=@/path/to/document.pdf" \
+  -F "angle=90" \
+  -F "pages=1,3-5" \
+  -F "output_name=rotated_document"</code></pre>
+
+      <h4>Example: Encrypting a PDF</h4>
+      <pre><code>curl -X POST https://your-domain.com/api/pdf/encrypt \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Accept: application/json" \
+  -F "file=@/path/to/document.pdf" \
+  -F "user_password=SecurePass123" \
+  -F "owner_password=AdminPass456" \
+  -F "output_name=encrypted_document"</code></pre>
+
+      <h4>Error Handling</h4>
+      <p>In case of errors, the API will return an appropriate HTTP status code and a JSON response with details:</p>
       <pre><code>{
-    "message": "Validation failed",
-    "errors": {
-        "files": ["The files field is required."]
-    }
+  "success": false,
+  "message": "Validation failed",
+  "errors": {
+    "file": ["The file field is required."],
+    "pages": ["The pages must be a string."]
+  }
 }</code></pre>
     </article>
   </section>
